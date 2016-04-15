@@ -24,6 +24,9 @@ Elm.Breakout.make = function (_elm) {
       };
    };
    var breakoutCharcoal = A3($Color.rgb,54,69,79);
+   var displayObj = F2(function (obj,shape) {
+      return A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: obj.x,_1: obj.y},A2($Graphics$Collage.filled,$Color.white,shape));
+   });
    var _p1 = {ctor: "_Tuple2",_0: 300,_1: 200};
    var halfWidth = _p1._0;
    var halfHeight = _p1._1;
@@ -44,6 +47,7 @@ Elm.Breakout.make = function (_elm) {
    };
    var main = A2($Signal.map,display,$Window.dimensions);
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var player = function (x) {    return {x: x,y: 0,vy: 0,vx: 0};};
    var Game = F3(function (a,b,c) {    return {ball: a,player: b,state: c};});
    var Input = F3(function (a,b,c) {    return {delta: a,paddle: b,space: c};});
    var Pause = {ctor: "Pause"};
@@ -54,12 +58,14 @@ Elm.Breakout.make = function (_elm) {
                                  ,Pause: Pause
                                  ,Input: Input
                                  ,Game: Game
+                                 ,player: player
                                  ,delta: delta
                                  ,defaultGame: defaultGame
                                  ,gameHeight: gameHeight
                                  ,gameWidth: gameWidth
                                  ,halfHeight: halfHeight
                                  ,halfWidth: halfWidth
+                                 ,displayObj: displayObj
                                  ,breakoutCharcoal: breakoutCharcoal
                                  ,textIvory: textIvory
                                  ,txt: txt

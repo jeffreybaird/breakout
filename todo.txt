@@ -11,6 +11,7 @@ Should have:
 1. Every time a row of bricks goes away, the ball goes faster
 2. Every time a row of bricks goes away, the paddle gets smaller
 3. When a row of bricks disappears, a new one appears behind it.
+4. A method for scoring and displaying the score
 
 Nice to have:
 
