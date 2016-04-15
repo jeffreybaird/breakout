@@ -15,7 +15,6 @@ type State = Play | Pause
 
 type alias Input =
   {
-  -- start the Game
     delta  : Time.Time
   , paddle : Int
   , space  : Bool
@@ -55,10 +54,6 @@ defaultGame =
     , player = {vx = 0.0, vy= 0.0, x= 0.0, y = 0.0}
   }
 
--- Change the direction of the ball after a collision
-
-
-
 -- View
 
 (gameWidth,gameHeight) = (600,400)
@@ -83,12 +78,7 @@ display (w,h) =
     in
       container w h middle <|
       collage gameWidth gameHeight
-       [ filled breakoutCharcoal   (rect gameWidth gameHeight)
-       , toForm scores
-           |> move (0, gameHeight/2 - 40)
-       , toForm (spacer 1 1)
-           |> move (0, 40 - gameHeight/2)
-       ]
+       [ filled breakoutCharcoal   (rect gameWidth gameHeight)]
 
 
 main : Signal Graphics.Element.Element

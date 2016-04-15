@@ -5648,16 +5648,12 @@ Elm.Breakout.make = function (_elm) {
    $Time = Elm.Time.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
-   var msg = "SPACE to start, WS and &uarr;&darr; to move";
    var textIvory = A3($Color.rgb,255,255,240);
    var txt = function (f) {
       return function (_p0) {
          return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,textIvory,$Text.fromString(_p0)))));
       };
    };
-   var displayObj = F2(function (obj,shape) {
-      return A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: obj.x,_1: obj.y},A2($Graphics$Collage.filled,$Color.white,shape));
-   });
    var breakoutCharcoal = A3($Color.rgb,54,69,79);
    var _p1 = {ctor: "_Tuple2",_0: 300,_1: 200};
    var halfWidth = _p1._0;
@@ -5675,9 +5671,7 @@ Elm.Breakout.make = function (_elm) {
       A3($Graphics$Collage.collage,
       gameWidth,
       gameHeight,
-      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
-              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: gameHeight / 2 - 40},$Graphics$Collage.toForm(scores))
-              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: 40 - gameHeight / 2},$Graphics$Collage.toForm(A2($Graphics$Element.spacer,1,1)))])));
+      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))])));
    };
    var main = A2($Signal.map,display,$Window.dimensions);
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
@@ -5698,10 +5692,8 @@ Elm.Breakout.make = function (_elm) {
                                  ,halfHeight: halfHeight
                                  ,halfWidth: halfWidth
                                  ,breakoutCharcoal: breakoutCharcoal
-                                 ,displayObj: displayObj
                                  ,textIvory: textIvory
                                  ,txt: txt
-                                 ,msg: msg
                                  ,display: display
                                  ,main: main};
 };</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.Breakout)</script></body></html>

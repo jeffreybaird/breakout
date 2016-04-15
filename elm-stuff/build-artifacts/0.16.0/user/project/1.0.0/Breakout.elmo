@@ -40,9 +40,7 @@ Elm.Breakout.make = function (_elm) {
       A3($Graphics$Collage.collage,
       gameWidth,
       gameHeight,
-      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
-              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: gameHeight / 2 - 40},$Graphics$Collage.toForm(scores))
-              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: 40 - gameHeight / 2},$Graphics$Collage.toForm(A2($Graphics$Element.spacer,1,1)))])));
+      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))])));
    };
    var main = A2($Signal.map,display,$Window.dimensions);
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
