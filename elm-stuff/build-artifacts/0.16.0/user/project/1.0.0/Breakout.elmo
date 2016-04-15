@@ -1,0 +1,70 @@
+Elm.Breakout = Elm.Breakout || {};
+Elm.Breakout.make = function (_elm) {
+   "use strict";
+   _elm.Breakout = _elm.Breakout || {};
+   if (_elm.Breakout.values) return _elm.Breakout.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Text = Elm.Text.make(_elm),
+   $Time = Elm.Time.make(_elm),
+   $Window = Elm.Window.make(_elm);
+   var _op = {};
+   var textIvory = A3($Color.rgb,255,255,240);
+   var txt = function (f) {
+      return function (_p0) {
+         return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,textIvory,$Text.fromString(_p0)))));
+      };
+   };
+   var breakoutCharcoal = A3($Color.rgb,54,69,79);
+   var _p1 = {ctor: "_Tuple2",_0: 300,_1: 200};
+   var halfWidth = _p1._0;
+   var halfHeight = _p1._1;
+   var _p2 = {ctor: "_Tuple2",_0: 600,_1: 400};
+   var gameWidth = _p2._0;
+   var gameHeight = _p2._1;
+   var display = function (_p3) {
+      var _p4 = _p3;
+      var scores = A2(txt,$Text.height(50),$Basics.toString(10));
+      return A4($Graphics$Element.container,
+      _p4._0,
+      _p4._1,
+      $Graphics$Element.middle,
+      A3($Graphics$Collage.collage,
+      gameWidth,
+      gameHeight,
+      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: gameHeight / 2 - 40},$Graphics$Collage.toForm(scores))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: 40 - gameHeight / 2},$Graphics$Collage.toForm(A2($Graphics$Element.spacer,1,1)))])));
+   };
+   var main = A2($Signal.map,display,$Window.dimensions);
+   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var Game = F3(function (a,b,c) {    return {ball: a,player: b,state: c};});
+   var Input = F3(function (a,b,c) {    return {delta: a,paddle: b,space: c};});
+   var Pause = {ctor: "Pause"};
+   var defaultGame = {state: Pause,ball: {x: 0,y: 0,vy: 200,vx: 200},player: {vx: 0.0,vy: 0.0,x: 0.0,y: 0.0}};
+   var Play = {ctor: "Play"};
+   return _elm.Breakout.values = {_op: _op
+                                 ,Play: Play
+                                 ,Pause: Pause
+                                 ,Input: Input
+                                 ,Game: Game
+                                 ,delta: delta
+                                 ,defaultGame: defaultGame
+                                 ,gameHeight: gameHeight
+                                 ,gameWidth: gameWidth
+                                 ,halfHeight: halfHeight
+                                 ,halfWidth: halfWidth
+                                 ,breakoutCharcoal: breakoutCharcoal
+                                 ,textIvory: textIvory
+                                 ,txt: txt
+                                 ,display: display
+                                 ,main: main};
+};
