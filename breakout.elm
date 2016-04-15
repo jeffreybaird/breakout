@@ -45,7 +45,7 @@ type alias Player =
 -- player -> determines the position of the paddle
 makePlayer : Float -> Player
 makePlayer x =
-  {x=x, y=0.0, vy=0.0, vx=0.0,score=0}
+  {x=x, y=10 - halfHeight, vy=0.0, vx=0.0,score=0}
 
 
 -- Track the passage of Time
@@ -56,7 +56,7 @@ defaultGame : Game
 defaultGame =
     {
       state   = Pause
-    , player = makePlayer(halfWidth - 10)
+    , player = makePlayer(gameHeight)
   }
 
 input : Signal Input
@@ -75,10 +75,10 @@ stepObj t ({x,y,vx,vy} as obj) =
         y = y + vy * t
     }
 
-stepPlayer : Time.Time -> Player -> Player
-stepPlayer(time, player) =
-    let player' = stepObj time { player | vx = toFloat 300 }
-        x'      = clamp (22-halfHeight) (halfHeight-22) player'.x
+stepPlayer : Time.Time -> Int -> Player -> Player
+stepPlayer time direction player =
+    let player' = stepObj time { player | vx = toFloat direction* 300 }
+        x'      = clamp (22-halfWidth) (halfWidth-22) player'.x
         score'  = player.score + 1
 
     in
@@ -93,7 +93,7 @@ stepGame input game =
   let
     {paddle,delta} = input
     {state,player} = game
-    player' = stepPlayer delta player
+    player' = stepPlayer delta paddle player
   in
     {game | player = player'}
 
@@ -130,7 +130,7 @@ display (w,h) {state,player} =
       container w h middle <|
       collage gameWidth gameHeight
        [ filled breakoutCharcoal   (rect gameWidth gameHeight)
-       , displayObj player (rect 10 40)
+       , displayObj player (rect 40 10)
        ]
 
 
