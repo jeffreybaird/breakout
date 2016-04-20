@@ -37,7 +37,8 @@ Elm.Breakout.make = function (_elm) {
    var display = F2(function (_p4,_p3) {
       var _p5 = _p4;
       var _p6 = _p3;
-      var scores = A2(txt,$Text.height(50),$Basics.toString(10));
+      var _p7 = _p6.ball;
+      var scores = A2(txt,$Text.height(50),$Basics.toString(_p7.y));
       return A4($Graphics$Element.container,
       _p5._0,
       _p5._1,
@@ -46,36 +47,52 @@ Elm.Breakout.make = function (_elm) {
       gameWidth,
       gameHeight,
       _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
+              ,A2(displayObj,_p7,A2($Graphics$Collage.oval,15,15))
               ,A2(displayObj,_p6.player,A2($Graphics$Collage.rect,40,10))])));
    });
+   var stepV = F3(function (v,lowerCollision,upperCollision) {    return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;});
    var updateGame = F2(function (game,player_lcl) {    return _U.update(game,{player: player_lcl});});
-   var stepObj = F2(function (t,_p7) {    var _p8 = _p7;return _U.update(_p8,{x: _p8.x + _p8.vx * t,y: _p8.y + _p8.vy * t});});
+   var near = F3(function (object1,distance,object2) {    return _U.cmp(object2,object1 - distance) > -1 && _U.cmp(object2,object1 + distance) < 1;});
+   var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
+   var stepObj = F2(function (t,_p8) {    var _p9 = _p8;return _U.update(_p9,{x: _p9.x + _p9.vx * t,y: _p9.y + _p9.vy * t});});
    var stepPlayer = F3(function (time,direction,player) {
       var score$ = player.score + 1;
       var player$ = A2(stepObj,time,_U.update(player,{vx: $Basics.toFloat(direction) * 300}));
       var x$ = A3($Basics.clamp,22 - halfWidth,halfWidth - 22,player$.x);
       return _U.update(player$,{x: x$,score: score$});
    });
-   var stepGame = F2(function (input,game) {
-      var _p9 = game;
-      var state = _p9.state;
-      var player = _p9.player;
-      var _p10 = input;
-      var paddle = _p10.paddle;
-      var delta = _p10.delta;
-      var player$ = A3(stepPlayer,delta,paddle,player);
-      return _U.update(game,{player: player$});
+   var stepBall = F3(function (time,_p10,player) {
+      var _p11 = _p10;
+      var _p13 = _p11.x;
+      var _p12 = _p11;
+      return A2(stepObj,
+      time,
+      _U.update(_p12,
+      {vy: A3(stepV,_p11.vy,A2(within,_p12,player),_U.cmp(_p11.y,halfHeight - 7) > 0)
+      ,vx: A3(stepV,_p11.vx,_U.cmp(_p13,7 - halfWidth) < 0,_U.cmp(_p13,halfWidth - 7) > 0)}));
    });
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
    var makePlayer = function (x) {    return {x: x,y: 10 - halfHeight,vy: 0.0,vx: 0.0,score: 0};};
-   var Game = F2(function (a,b) {    return {state: a,player: b};});
+   var Game = F3(function (a,b,c) {    return {ball: a,state: b,player: c};});
    var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
    var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
    var Pause = {ctor: "Pause"};
-   var defaultGame = {state: Pause,player: makePlayer(gameHeight)};
+   var stepGame = F2(function (input,game) {
+      var _p14 = game;
+      var ball = _p14.ball;
+      var state = _p14.state;
+      var player = _p14.player;
+      var _p15 = input;
+      var paddle = _p15.paddle;
+      var delta = _p15.delta;
+      var player$ = A3(stepPlayer,delta,paddle,player);
+      var ball$ = _U.eq(state,Pause) ? ball : A3(stepBall,delta,ball,player);
+      return _U.update(game,{player: player$,ball: ball$});
+   });
+   var Play = {ctor: "Play"};
+   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: makePlayer(gameHeight)};
    var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
    var main = A3($Signal.map2,display,$Window.dimensions,gameState);
-   var Play = {ctor: "Play"};
    return _elm.Breakout.values = {_op: _op
                                  ,Play: Play
                                  ,Pause: Pause
@@ -86,8 +103,12 @@ Elm.Breakout.make = function (_elm) {
                                  ,defaultGame: defaultGame
                                  ,input: input
                                  ,stepObj: stepObj
+                                 ,near: near
+                                 ,within: within
                                  ,stepPlayer: stepPlayer
                                  ,updateGame: updateGame
+                                 ,stepV: stepV
+                                 ,stepBall: stepBall
                                  ,stepGame: stepGame
                                  ,gameState: gameState
                                  ,gameHeight: gameHeight

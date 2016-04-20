@@ -22,7 +22,8 @@ type alias Input =
 
 type alias Game =
   {
-    state   : State
+    ball    : Ball
+  , state   : State
   , player  : Player
   }
 
@@ -55,7 +56,8 @@ delta = Signal.map Time.inSeconds (Time.fps 35)
 defaultGame : Game
 defaultGame =
     {
-      state   = Pause
+      ball    = {x=0, y=0, vy=-100, vx=100}
+    , state   = Play
     , player = makePlayer(gameHeight)
   }
 
@@ -75,6 +77,16 @@ stepObj t ({x,y,vx,vy} as obj) =
         y = y + vy * t
     }
 
+near : Float -> Float -> Float -> Bool
+near object1 distance object2 =
+  object2 >= object1 - distance && object2 <= object1 + distance
+
+-- Is the ball within the paddle?
+
+within : Ball -> Player -> Bool
+within ball player =
+  near player.x 8 ball.x && near player.y 20 ball.y
+
 stepPlayer : Time.Time -> Int -> Player -> Player
 stepPlayer time direction player =
     let player' = stepObj time { player | vx = toFloat direction* 300 }
@@ -88,14 +100,34 @@ updateGame : Game -> Player -> Game
 updateGame game player_lcl =
   {game | player = player_lcl}
 
+stepV : Float -> Bool -> Bool -> Float
+stepV v lowerCollision upperCollision =
+  if lowerCollision then abs v
+  else if upperCollision then 0 - abs v
+  else v
+
+stepBall : Time.Time -> Ball -> Player -> Ball
+stepBall time ({x,y,vx,vy} as ball) player =
+      stepObj time
+          { ball |
+            vy =
+              stepV vy (ball `within` player) (y > halfHeight - 7),
+            vx =
+              stepV vx (x < 7-halfWidth) (x > halfWidth-7)
+        }
+
 stepGame : Input -> Game -> Game
 stepGame input game =
   let
     {paddle,delta} = input
-    {state,player} = game
+    {ball, state,player} = game
     player' = stepPlayer delta paddle player
+    ball' =
+        if state == Pause
+            then ball
+            else stepBall delta ball player
   in
-    {game | player = player'}
+    {game | player = player', ball = ball'}
 
 gameState : Signal Game
 gameState =
@@ -121,15 +153,16 @@ txt f = leftAligned << f << Text.monospace << Text.color textIvory << Text.fromS
 
 
 display : (Int, Int) -> Game -> Graphics.Element.Element
-display (w,h) {state,player} =
+display (w,h) {ball,state,player} =
     let scores : Graphics.Element.Element
         scores =
-            toString 10
+            toString ball.y
               |> txt (Text.height 50)
     in
       container w h middle <|
       collage gameWidth gameHeight
        [ filled breakoutCharcoal   (rect gameWidth gameHeight)
+       , displayObj ball    (oval 15 15)
        , displayObj player (rect 40 10)
        ]
 
