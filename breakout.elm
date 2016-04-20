@@ -25,6 +25,7 @@ type alias Game =
     ball    : Ball
   , state   : State
   , player  : Player
+  , bricks  : Bricks
   }
 
 type alias Object a =
@@ -40,6 +41,11 @@ type alias Ball =
 
 type alias Player =
   Object {score : Int}
+
+type alias BrickRow = List
+
+type alias Brick =
+  Object {color : Color.Color}
 
 -- Model
 
@@ -59,7 +65,16 @@ defaultGame =
       ball    = {x=0, y=0, vy=-100, vx=100}
     , state   = Play
     , player = makePlayer(gameHeight)
+    , bricks = [brickRow(1,2,3,Color.orange,[])]
   }
+
+brickRow : Int -> Int -> Int -> Color.Color -> List -> BrickRow
+brickRow n posx posy brickColor bricks=
+  if n == 0 then bricks
+  else
+    -- b = List.append bricks [{x = posx, y = posy, vy = 0, vx = 0, color = brickColor }]
+    brickRow (n-1) (posx + 20) posy color bricks
+
 
 input : Signal Input
 input =
