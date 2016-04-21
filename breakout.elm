@@ -42,8 +42,6 @@ type alias Ball =
 type alias Player =
   Object {score : Int}
 
-type alias BrickRow = List
-
 type alias Brick =
   Object {color : Color.Color}
 
@@ -53,6 +51,11 @@ type alias Brick =
 makePlayer : Float -> Player
 makePlayer x =
   {x=x, y=10 - halfHeight, vy=0.0, vx=0.0,score=0}
+
+makeBrick : Float -> Brick
+makeBrick x =
+  {x=x, y=halfHeight-7, vy=0, vx = 0, color=Color.green}
+
 
 
 -- Track the passage of Time
@@ -65,16 +68,42 @@ defaultGame =
       ball    = {x=0, y=0, vy=-100, vx=100}
     , state   = Play
     , player = makePlayer(gameHeight)
-    , bricks = [{x=0, y=0, vy=0, vx = 0, color = Color.green}]
+    , bricks = createBreaks
   }
 
-brickRow : number -> number' -> number'' -> Color.Color -> Bricks -> Bricks
-brickRow n posx posy brickColor bricks=
-  if n == 0 then bricks
-  else
-    -- b = List.append bricks [{x = posx, y = posy, vy = 0, vx = 0, color = brickColor }]
-    brickRow (n-1) (posx + 40) posy brickColor bricks
 
+firstBrick : Bricks
+firstBrick =
+  [{x=21-halfWidth, y=halfHeight-7, vy=0, vx = 0, color = Color.green}]
+
+
+initBrick: Brick
+initBrick = makeBrick(31-halfWidth)
+
+newBricks: Bricks
+newBricks = initBrick :: []
+
+
+createBreaks : Bricks
+createBreaks  =
+  createSubsequentBricks 10 initBrick newBricks
+  
+
+createSubsequentBricks : Int -> Brick -> Bricks -> Bricks
+createSubsequentBricks numberOfBricksLeft brick bricks =
+  let
+    nextBrick: Brick
+    nextBrick = makeBrick(brick.x + 31)
+
+    newBricks: Bricks
+    newBricks = nextBrick :: bricks
+
+    num : Int
+    num = numberOfBricksLeft-1
+  in
+    if numberOfBricksLeft == 0 then bricks
+    else
+      createSubsequentBricks num nextBrick newBricks
 
 input : Signal Input
 input =
@@ -189,7 +218,7 @@ display (w,h) {ball,state,player, bricks} =
               |> txt (Text.height 50)
         shapes : List Shape
         shapes =
-          createShapes 10 (rect 40 10) []
+          createShapes 10 (rect 60 10) []
 
         brickDisplay: List Form
         brickDisplay =

@@ -43,7 +43,7 @@ Elm.Breakout.make = function (_elm) {
       var _p5 = _p4;
       var _p6 = _p3;
       var _p7 = _p6.ball;
-      var shapes = A3(createShapes,10,A2($Graphics$Collage.rect,40,10),_U.list([]));
+      var shapes = A3(createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
       var brickDisplay = A2(displayBricks,_p6.bricks,shapes);
       var displayObjects = A2($List.append,
       _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
@@ -74,18 +74,26 @@ Elm.Breakout.make = function (_elm) {
       {vy: A3(stepV,_p11.vy,A2(within,_p12,player),_U.cmp(_p11.y,halfHeight - 7) > 0)
       ,vx: A3(stepV,_p11.vx,_U.cmp(_p13,7 - halfWidth) < 0,_U.cmp(_p13,halfWidth - 7) > 0)}));
    });
-   var brickRow = F5(function (n,posx,posy,brickColor,bricks) {
-      brickRow: while (true) if (_U.eq(n,0)) return bricks; else {
-            var _v4 = n - 1,_v5 = posx + 40,_v6 = posy,_v7 = brickColor,_v8 = bricks;
-            n = _v4;
-            posx = _v5;
-            posy = _v6;
-            brickColor = _v7;
-            bricks = _v8;
-            continue brickRow;
-         }
-   });
+   var firstBrick = _U.list([{x: 21 - halfWidth,y: halfHeight - 7,vy: 0,vx: 0,color: $Color.green}]);
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var makeBrick = function (x) {    return {x: x,y: halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
+   var initBrick = makeBrick(31 - halfWidth);
+   var newBricks = A2($List._op["::"],initBrick,_U.list([]));
+   var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {
+      createSubsequentBricks: while (true) {
+         var num = numberOfBricksLeft - 1;
+         var nextBrick = makeBrick(brick.x + 31);
+         var newBricks = A2($List._op["::"],nextBrick,bricks);
+         if (_U.eq(numberOfBricksLeft,0)) return bricks; else {
+               var _v4 = num,_v5 = nextBrick,_v6 = newBricks;
+               numberOfBricksLeft = _v4;
+               brick = _v5;
+               bricks = _v6;
+               continue createSubsequentBricks;
+            }
+      }
+   });
+   var createBreaks = A3(createSubsequentBricks,10,initBrick,newBricks);
    var makePlayer = function (x) {    return {x: x,y: 10 - halfHeight,vy: 0.0,vx: 0.0,score: 0};};
    var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
    var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
@@ -104,10 +112,7 @@ Elm.Breakout.make = function (_elm) {
       return _U.update(game,{player: player$,ball: ball$});
    });
    var Play = {ctor: "Play"};
-   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100}
-                     ,state: Play
-                     ,player: makePlayer(gameHeight)
-                     ,bricks: _U.list([{x: 0,y: 0,vy: 0,vx: 0,color: $Color.green}])};
+   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: makePlayer(gameHeight),bricks: createBreaks};
    var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
    var main = A3($Signal.map2,display,$Window.dimensions,gameState);
    return _elm.Breakout.values = {_op: _op
@@ -116,9 +121,14 @@ Elm.Breakout.make = function (_elm) {
                                  ,Input: Input
                                  ,Game: Game
                                  ,makePlayer: makePlayer
+                                 ,makeBrick: makeBrick
                                  ,delta: delta
                                  ,defaultGame: defaultGame
-                                 ,brickRow: brickRow
+                                 ,firstBrick: firstBrick
+                                 ,initBrick: initBrick
+                                 ,newBricks: newBricks
+                                 ,createBreaks: createBreaks
+                                 ,createSubsequentBricks: createSubsequentBricks
                                  ,input: input
                                  ,stepObj: stepObj
                                  ,near: near
