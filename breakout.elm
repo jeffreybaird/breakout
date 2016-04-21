@@ -10,7 +10,7 @@ import Keyboard
 
 -- representation of the Game
 
-type alias Bricks = List
+type alias Bricks = List Brick
 
 type State = Play | Pause
 
@@ -65,15 +65,15 @@ defaultGame =
       ball    = {x=0, y=0, vy=-100, vx=100}
     , state   = Play
     , player = makePlayer(gameHeight)
-    , bricks = [brickRow(1,2,3,Color.orange,[])]
+    , bricks = [{x=0, y=0, vy=0, vx = 0, color = Color.green}]
   }
 
-brickRow : Int -> Int -> Int -> Color.Color -> List -> BrickRow
+brickRow : number -> number' -> number'' -> Color.Color -> Bricks -> Bricks
 brickRow n posx posy brickColor bricks=
   if n == 0 then bricks
   else
     -- b = List.append bricks [{x = posx, y = posy, vy = 0, vx = 0, color = brickColor }]
-    brickRow (n-1) (posx + 20) posy color bricks
+    brickRow (n-1) (posx + 40) posy brickColor bricks
 
 
 input : Signal Input
@@ -153,9 +153,23 @@ gameState =
 (gameWidth,gameHeight) = (600,400)
 (halfWidth,halfHeight) = (300,200)
 
-displayObj : Object a -> Shape -> Form
-displayObj obj shape =
-    move (obj.x, obj.y) (filled Color.white shape)
+displayBricks : Bricks -> List Shape -> List Form
+displayBricks bricks shapes =
+  let
+    brickColors : List Color.Color
+    brickColors = List.map .color bricks
+  in
+    List.map3 displayObj bricks shapes brickColors
+
+createShapes: Int -> Shape -> List Shape -> List Shape
+createShapes n shape shapes =
+  if n == 0 then shapes
+  else List.append shapes [shape]
+
+
+displayObj : Object a -> Shape -> Color.Color -> Form
+displayObj obj shape shapeColor =
+    move (obj.x, obj.y) (filled shapeColor shape)
 
 breakoutCharcoal : Color.Color
 breakoutCharcoal = rgb 54 69 79
@@ -168,18 +182,29 @@ txt f = leftAligned << f << Text.monospace << Text.color textIvory << Text.fromS
 
 
 display : (Int, Int) -> Game -> Graphics.Element.Element
-display (w,h) {ball,state,player} =
+display (w,h) {ball,state,player, bricks} =
     let scores : Graphics.Element.Element
         scores =
             toString ball.y
               |> txt (Text.height 50)
+        shapes : List Shape
+        shapes =
+          createShapes 10 (rect 40 10) []
+
+        brickDisplay: List Form
+        brickDisplay =
+          displayBricks bricks shapes
+
+        displayObjects: List Form
+        displayObjects =
+          List.append [ filled breakoutCharcoal   (rect gameWidth gameHeight)
+          , displayObj ball (oval 15 15) Color.white
+          , displayObj player (rect 40 10) Color.white
+          ] brickDisplay
+
     in
       container w h middle <|
-      collage gameWidth gameHeight
-       [ filled breakoutCharcoal   (rect gameWidth gameHeight)
-       , displayObj ball    (oval 15 15)
-       , displayObj player (rect 40 10)
-       ]
+      collage gameWidth gameHeight displayObjects
 
 
 main : Signal Graphics.Element.Element
