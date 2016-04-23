@@ -5,150 +5,44 @@ Elm.Breakout.make = function (_elm) {
    if (_elm.Breakout.values) return _elm.Breakout.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
    $Color = Elm.Color.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Game = Elm.Game.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $Keyboard = Elm.Keyboard.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Text = Elm.Text.make(_elm),
-   $Time = Elm.Time.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
-   var textIvory = A3($Color.rgb,255,255,240);
    var txt = function (f) {
       return function (_p0) {
-         return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,textIvory,$Text.fromString(_p0)))));
+         return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,$Constants.textIvory,$Text.fromString(_p0)))));
       };
    };
-   var breakoutCharcoal = A3($Color.rgb,54,69,79);
-   var displayObj = F3(function (obj,shape,shapeColor) {
-      return A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: obj.x,_1: obj.y},A2($Graphics$Collage.filled,shapeColor,shape));
-   });
-   var createShapes = F3(function (n,shape,shapes) {    return _U.eq(n,0) ? shapes : A2($List.append,shapes,_U.list([shape]));});
-   var displayBricks = F2(function (bricks,shapes) {
-      var brickColors = A2($List.map,function (_) {    return _.color;},bricks);
-      return A4($List.map3,displayObj,bricks,shapes,brickColors);
-   });
-   var _p1 = {ctor: "_Tuple2",_0: 300,_1: 200};
-   var halfWidth = _p1._0;
-   var halfHeight = _p1._1;
-   var _p2 = {ctor: "_Tuple2",_0: 600,_1: 400};
-   var gameWidth = _p2._0;
-   var gameHeight = _p2._1;
-   var display = F2(function (_p4,_p3) {
-      var _p5 = _p4;
-      var _p6 = _p3;
-      var _p7 = _p6.ball;
-      var shapes = A3(createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
-      var brickDisplay = A2(displayBricks,_p6.bricks,shapes);
+   var display = F2(function (_p2,_p1) {
+      var _p3 = _p2;
+      var _p4 = _p1;
+      var _p5 = _p4.ball;
+      var shapes = A3($Object.createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
+      var brickDisplay = A2($Bricks.displayBricks,_p4.bricks,shapes);
       var displayObjects = A2($List.append,
-      _U.list([A2($Graphics$Collage.filled,breakoutCharcoal,A2($Graphics$Collage.rect,gameWidth,gameHeight))
-              ,A3(displayObj,_p7,A2($Graphics$Collage.oval,15,15),$Color.white)
-              ,A3(displayObj,_p6.player,A2($Graphics$Collage.rect,40,10),$Color.white)]),
+      _U.list([A2($Graphics$Collage.filled,$Constants.breakoutCharcoal,A2($Graphics$Collage.rect,$Constants.gameWidth,$Constants.gameHeight))
+              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.oval,15,15),$Color.white)
+              ,A3($Object.displayObj,_p4.player,A2($Graphics$Collage.rect,40,10),$Color.white)]),
       brickDisplay);
-      var scores = A2(txt,$Text.height(50),$Basics.toString(_p7.y));
-      return A4($Graphics$Element.container,_p5._0,_p5._1,$Graphics$Element.middle,A3($Graphics$Collage.collage,gameWidth,gameHeight,displayObjects));
+      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.y));
+      return A4($Graphics$Element.container,
+      _p3._0,
+      _p3._1,
+      $Graphics$Element.middle,
+      A3($Graphics$Collage.collage,$Constants.gameWidth,$Constants.gameHeight,displayObjects));
    });
-   var stepV = F3(function (v,lowerCollision,upperCollision) {    return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;});
-   var updateGame = F2(function (game,player_lcl) {    return _U.update(game,{player: player_lcl});});
-   var near = F3(function (object1,distance,object2) {    return _U.cmp(object2,object1 - distance) > -1 && _U.cmp(object2,object1 + distance) < 1;});
-   var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
-   var stepObj = F2(function (t,_p8) {    var _p9 = _p8;return _U.update(_p9,{x: _p9.x + _p9.vx * t,y: _p9.y + _p9.vy * t});});
-   var stepPlayer = F3(function (time,direction,player) {
-      var score$ = player.score + 1;
-      var player$ = A2(stepObj,time,_U.update(player,{vx: $Basics.toFloat(direction) * 300}));
-      var x$ = A3($Basics.clamp,22 - halfWidth,halfWidth - 22,player$.x);
-      return _U.update(player$,{x: x$,score: score$});
-   });
-   var stepBall = F3(function (time,_p10,player) {
-      var _p11 = _p10;
-      var _p13 = _p11.x;
-      var _p12 = _p11;
-      return A2(stepObj,
-      time,
-      _U.update(_p12,
-      {vy: A3(stepV,_p11.vy,A2(within,_p12,player),_U.cmp(_p11.y,halfHeight - 7) > 0)
-      ,vx: A3(stepV,_p11.vx,_U.cmp(_p13,7 - halfWidth) < 0,_U.cmp(_p13,halfWidth - 7) > 0)}));
-   });
-   var firstBrick = _U.list([{x: 21 - halfWidth,y: halfHeight - 7,vy: 0,vx: 0,color: $Color.green}]);
-   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
-   var makeBrick = function (x) {    return {x: x,y: halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
-   var initBrick = makeBrick(31 - halfWidth);
-   var newBricks = A2($List._op["::"],initBrick,_U.list([]));
-   var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {
-      createSubsequentBricks: while (true) {
-         var num = numberOfBricksLeft - 1;
-         var nextBrick = makeBrick(brick.x + 31);
-         var newBricks = A2($List._op["::"],nextBrick,bricks);
-         if (_U.eq(numberOfBricksLeft,0)) return bricks; else {
-               var _v4 = num,_v5 = nextBrick,_v6 = newBricks;
-               numberOfBricksLeft = _v4;
-               brick = _v5;
-               bricks = _v6;
-               continue createSubsequentBricks;
-            }
-      }
-   });
-   var createBreaks = A3(createSubsequentBricks,10,initBrick,newBricks);
-   var makePlayer = function (x) {    return {x: x,y: 10 - halfHeight,vy: 0.0,vx: 0.0,score: 0};};
-   var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
-   var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
-   var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
-   var Pause = {ctor: "Pause"};
-   var stepGame = F2(function (input,game) {
-      var _p14 = game;
-      var ball = _p14.ball;
-      var state = _p14.state;
-      var player = _p14.player;
-      var _p15 = input;
-      var paddle = _p15.paddle;
-      var delta = _p15.delta;
-      var player$ = A3(stepPlayer,delta,paddle,player);
-      var ball$ = _U.eq(state,Pause) ? ball : A3(stepBall,delta,ball,player);
-      return _U.update(game,{player: player$,ball: ball$});
-   });
-   var Play = {ctor: "Play"};
-   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: makePlayer(gameHeight),bricks: createBreaks};
-   var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
-   var main = A3($Signal.map2,display,$Window.dimensions,gameState);
-   return _elm.Breakout.values = {_op: _op
-                                 ,Play: Play
-                                 ,Pause: Pause
-                                 ,Input: Input
-                                 ,Game: Game
-                                 ,makePlayer: makePlayer
-                                 ,makeBrick: makeBrick
-                                 ,delta: delta
-                                 ,defaultGame: defaultGame
-                                 ,firstBrick: firstBrick
-                                 ,initBrick: initBrick
-                                 ,newBricks: newBricks
-                                 ,createBreaks: createBreaks
-                                 ,createSubsequentBricks: createSubsequentBricks
-                                 ,input: input
-                                 ,stepObj: stepObj
-                                 ,near: near
-                                 ,within: within
-                                 ,stepPlayer: stepPlayer
-                                 ,updateGame: updateGame
-                                 ,stepV: stepV
-                                 ,stepBall: stepBall
-                                 ,stepGame: stepGame
-                                 ,gameState: gameState
-                                 ,gameHeight: gameHeight
-                                 ,gameWidth: gameWidth
-                                 ,halfHeight: halfHeight
-                                 ,halfWidth: halfWidth
-                                 ,displayBricks: displayBricks
-                                 ,createShapes: createShapes
-                                 ,displayObj: displayObj
-                                 ,breakoutCharcoal: breakoutCharcoal
-                                 ,textIvory: textIvory
-                                 ,txt: txt
-                                 ,display: display
-                                 ,main: main};
+   var main = A3($Signal.map2,display,$Window.dimensions,$Game.gameState);
+   return _elm.Breakout.values = {_op: _op,txt: txt,display: display,main: main};
 };

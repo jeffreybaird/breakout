@@ -1,0 +1,52 @@
+Elm.Game = Elm.Game || {};
+Elm.Game.make = function (_elm) {
+   "use strict";
+   _elm.Game = _elm.Game || {};
+   if (_elm.Game.values) return _elm.Game.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Ball = Elm.Ball.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Player = Elm.Player.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var updateGame = F2(function (game,player_lcl) {    return _U.update(game,{player: player_lcl});});
+   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
+   var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
+   var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
+   var Pause = {ctor: "Pause"};
+   var stepGame = F2(function (input,game) {
+      var _p0 = game;
+      var ball = _p0.ball;
+      var state = _p0.state;
+      var player = _p0.player;
+      var _p1 = input;
+      var paddle = _p1.paddle;
+      var delta = _p1.delta;
+      var player$ = A3($Player.stepPlayer,delta,paddle,player);
+      var ball$ = _U.eq(state,Pause) ? ball : A3($Ball.stepBall,delta,ball,player);
+      return _U.update(game,{player: player$,ball: ball$});
+   });
+   var Play = {ctor: "Play"};
+   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
+   var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
+   return _elm.Game.values = {_op: _op
+                             ,Play: Play
+                             ,Pause: Pause
+                             ,Input: Input
+                             ,Game: Game
+                             ,delta: delta
+                             ,defaultGame: defaultGame
+                             ,input: input
+                             ,updateGame: updateGame
+                             ,stepGame: stepGame
+                             ,gameState: gameState};
+};

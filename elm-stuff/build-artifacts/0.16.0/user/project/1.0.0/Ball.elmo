@@ -1,0 +1,32 @@
+Elm.Ball = Elm.Ball || {};
+Elm.Ball.make = function (_elm) {
+   "use strict";
+   _elm.Ball = _elm.Ball || {};
+   if (_elm.Ball.values) return _elm.Ball.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
+   $Player = Elm.Player.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var near = F3(function (object1,distance,object2) {    return _U.cmp(object2,object1 - distance) > -1 && _U.cmp(object2,object1 + distance) < 1;});
+   var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
+   var stepV = F3(function (v,lowerCollision,upperCollision) {    return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;});
+   var stepBall = F3(function (time,_p0,player) {
+      var _p1 = _p0;
+      var _p3 = _p1.x;
+      var _p2 = _p1;
+      return A2($Object.stepObj,
+      time,
+      _U.update(_p2,
+      {vy: A3(stepV,_p1.vy,A2(within,_p2,player),_U.cmp(_p1.y,$Constants.halfHeight - 7) > 0)
+      ,vx: A3(stepV,_p1.vx,_U.cmp(_p3,7 - $Constants.halfWidth) < 0,_U.cmp(_p3,$Constants.halfWidth - 7) > 0)}));
+   });
+   return _elm.Ball.values = {_op: _op,stepBall: stepBall,stepV: stepV,near: near,within: within};
+};

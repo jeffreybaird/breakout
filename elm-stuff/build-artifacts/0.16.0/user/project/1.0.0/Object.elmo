@@ -1,0 +1,23 @@
+Elm.Object = Elm.Object || {};
+Elm.Object.make = function (_elm) {
+   "use strict";
+   _elm.Object = _elm.Object || {};
+   if (_elm.Object.values) return _elm.Object.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var createShapes = F3(function (n,shape,shapes) {    return _U.eq(n,0) ? shapes : A2($List.append,shapes,_U.list([shape]));});
+   var displayObj = F3(function (obj,shape,shapeColor) {
+      return A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: obj.x,_1: obj.y},A2($Graphics$Collage.filled,shapeColor,shape));
+   });
+   var stepObj = F2(function (t,_p0) {    var _p1 = _p0;return _U.update(_p1,{x: _p1.x + _p1.vx * t,y: _p1.y + _p1.vy * t});});
+   return _elm.Object.values = {_op: _op,stepObj: stepObj,displayObj: displayObj,createShapes: createShapes};
+};

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html><head><meta charset="UTF-8"><title>BreakoutTest</title><style>html,head,body { padding:0; margin:0; }
+<html><head><meta charset="UTF-8"><title>BallTest</title><style>html,head,body { padding:0; margin:0; }
 body { font-family: calibri, helvetica, arial, sans-serif; }</style><script type="text/javascript">var Elm = Elm || { Native: {} };Elm.Native.Basics = {};
 Elm.Native.Basics.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
@@ -9152,241 +9152,6 @@ Elm.Time.make = function (_elm) {
                              ,timestamp: timestamp
                              ,delay: delay
                              ,since: since};
-};Elm.Set = Elm.Set || {};
-Elm.Set.make = function (_elm) {
-   "use strict";
-   _elm.Set = _elm.Set || {};
-   if (_elm.Set.values) return _elm.Set.values;
-   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Dict = Elm.Dict.make(_elm),$List = Elm.List.make(_elm);
-   var _op = {};
-   var foldr = F3(function (f,b,_p0) {    var _p1 = _p0;return A3($Dict.foldr,F3(function (k,_p2,b) {    return A2(f,k,b);}),b,_p1._0);});
-   var foldl = F3(function (f,b,_p3) {    var _p4 = _p3;return A3($Dict.foldl,F3(function (k,_p5,b) {    return A2(f,k,b);}),b,_p4._0);});
-   var toList = function (_p6) {    var _p7 = _p6;return $Dict.keys(_p7._0);};
-   var size = function (_p8) {    var _p9 = _p8;return $Dict.size(_p9._0);};
-   var member = F2(function (k,_p10) {    var _p11 = _p10;return A2($Dict.member,k,_p11._0);});
-   var isEmpty = function (_p12) {    var _p13 = _p12;return $Dict.isEmpty(_p13._0);};
-   var Set_elm_builtin = function (a) {    return {ctor: "Set_elm_builtin",_0: a};};
-   var empty = Set_elm_builtin($Dict.empty);
-   var singleton = function (k) {    return Set_elm_builtin(A2($Dict.singleton,k,{ctor: "_Tuple0"}));};
-   var insert = F2(function (k,_p14) {    var _p15 = _p14;return Set_elm_builtin(A3($Dict.insert,k,{ctor: "_Tuple0"},_p15._0));});
-   var fromList = function (xs) {    return A3($List.foldl,insert,empty,xs);};
-   var map = F2(function (f,s) {    return fromList(A2($List.map,f,toList(s)));});
-   var remove = F2(function (k,_p16) {    var _p17 = _p16;return Set_elm_builtin(A2($Dict.remove,k,_p17._0));});
-   var union = F2(function (_p19,_p18) {    var _p20 = _p19;var _p21 = _p18;return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));});
-   var intersect = F2(function (_p23,_p22) {    var _p24 = _p23;var _p25 = _p22;return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));});
-   var diff = F2(function (_p27,_p26) {    var _p28 = _p27;var _p29 = _p26;return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));});
-   var filter = F2(function (p,_p30) {    var _p31 = _p30;return Set_elm_builtin(A2($Dict.filter,F2(function (k,_p32) {    return p(k);}),_p31._0));});
-   var partition = F2(function (p,_p33) {
-      var _p34 = _p33;
-      var _p35 = A2($Dict.partition,F2(function (k,_p36) {    return p(k);}),_p34._0);
-      var p1 = _p35._0;
-      var p2 = _p35._1;
-      return {ctor: "_Tuple2",_0: Set_elm_builtin(p1),_1: Set_elm_builtin(p2)};
-   });
-   return _elm.Set.values = {_op: _op
-                            ,empty: empty
-                            ,singleton: singleton
-                            ,insert: insert
-                            ,remove: remove
-                            ,isEmpty: isEmpty
-                            ,member: member
-                            ,size: size
-                            ,foldl: foldl
-                            ,foldr: foldr
-                            ,map: map
-                            ,filter: filter
-                            ,partition: partition
-                            ,union: union
-                            ,intersect: intersect
-                            ,diff: diff
-                            ,toList: toList
-                            ,fromList: fromList};
-};Elm.Native.Keyboard = {};
-
-Elm.Native.Keyboard.make = function(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
-	if (localRuntime.Native.Keyboard.values)
-	{
-		return localRuntime.Native.Keyboard.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-
-
-	function keyEvent(event)
-	{
-		return {
-			alt: event.altKey,
-			meta: event.metaKey,
-			keyCode: event.keyCode
-		};
-	}
-
-
-	function keyStream(node, eventName, handler)
-	{
-		var stream = NS.input(eventName, { alt: false, meta: false, keyCode: 0 });
-
-		localRuntime.addListener([stream.id], node, eventName, function(e) {
-			localRuntime.notify(stream.id, handler(e));
-		});
-
-		return stream;
-	}
-
-	var downs = keyStream(document, 'keydown', keyEvent);
-	var ups = keyStream(document, 'keyup', keyEvent);
-	var presses = keyStream(document, 'keypress', keyEvent);
-	var blurs = keyStream(window, 'blur', function() { return null; });
-
-
-	return localRuntime.Native.Keyboard.values = {
-		downs: downs,
-		ups: ups,
-		blurs: blurs,
-		presses: presses
-	};
-};
-Elm.Keyboard = Elm.Keyboard || {};
-Elm.Keyboard.make = function (_elm) {
-   "use strict";
-   _elm.Keyboard = _elm.Keyboard || {};
-   if (_elm.Keyboard.values) return _elm.Keyboard.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Char = Elm.Char.make(_elm),
-   $Native$Keyboard = Elm.Native.Keyboard.make(_elm),
-   $Set = Elm.Set.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var presses = A2($Signal.map,function (_) {    return _.keyCode;},$Native$Keyboard.presses);
-   var toXY = F2(function (_p0,keyCodes) {
-      var _p1 = _p0;
-      var is = function (keyCode) {    return A2($Set.member,keyCode,keyCodes) ? 1 : 0;};
-      return {x: is(_p1.right) - is(_p1.left),y: is(_p1.up) - is(_p1.down)};
-   });
-   var Directions = F4(function (a,b,c,d) {    return {up: a,down: b,left: c,right: d};});
-   var dropMap = F2(function (f,signal) {    return $Signal.dropRepeats(A2($Signal.map,f,signal));});
-   var EventInfo = F3(function (a,b,c) {    return {alt: a,meta: b,keyCode: c};});
-   var Blur = {ctor: "Blur"};
-   var Down = function (a) {    return {ctor: "Down",_0: a};};
-   var Up = function (a) {    return {ctor: "Up",_0: a};};
-   var rawEvents = $Signal.mergeMany(_U.list([A2($Signal.map,Up,$Native$Keyboard.ups)
-                                             ,A2($Signal.map,Down,$Native$Keyboard.downs)
-                                             ,A2($Signal.map,$Basics.always(Blur),$Native$Keyboard.blurs)]));
-   var empty = {alt: false,meta: false,keyCodes: $Set.empty};
-   var update = F2(function (event,model) {
-      var _p2 = event;
-      switch (_p2.ctor)
-      {case "Down": var _p3 = _p2._0;
-           return {alt: _p3.alt,meta: _p3.meta,keyCodes: A2($Set.insert,_p3.keyCode,model.keyCodes)};
-         case "Up": var _p4 = _p2._0;
-           return {alt: _p4.alt,meta: _p4.meta,keyCodes: A2($Set.remove,_p4.keyCode,model.keyCodes)};
-         default: return empty;}
-   });
-   var model = A3($Signal.foldp,update,empty,rawEvents);
-   var alt = A2(dropMap,function (_) {    return _.alt;},model);
-   var meta = A2(dropMap,function (_) {    return _.meta;},model);
-   var keysDown = A2(dropMap,function (_) {    return _.keyCodes;},model);
-   var arrows = A2(dropMap,toXY({up: 38,down: 40,left: 37,right: 39}),keysDown);
-   var wasd = A2(dropMap,toXY({up: 87,down: 83,left: 65,right: 68}),keysDown);
-   var isDown = function (keyCode) {    return A2(dropMap,$Set.member(keyCode),keysDown);};
-   var ctrl = isDown(17);
-   var shift = isDown(16);
-   var space = isDown(32);
-   var enter = isDown(13);
-   var Model = F3(function (a,b,c) {    return {alt: a,meta: b,keyCodes: c};});
-   return _elm.Keyboard.values = {_op: _op
-                                 ,arrows: arrows
-                                 ,wasd: wasd
-                                 ,enter: enter
-                                 ,space: space
-                                 ,ctrl: ctrl
-                                 ,shift: shift
-                                 ,alt: alt
-                                 ,meta: meta
-                                 ,isDown: isDown
-                                 ,keysDown: keysDown
-                                 ,presses: presses};
-};Elm.Native = Elm.Native || {};
-Elm.Native.Window = {};
-Elm.Native.Window.make = function make(localRuntime) {
-	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Window = localRuntime.Native.Window || {};
-	if (localRuntime.Native.Window.values)
-	{
-		return localRuntime.Native.Window.values;
-	}
-
-	var NS = Elm.Native.Signal.make(localRuntime);
-	var Tuple2 = Elm.Native.Utils.make(localRuntime).Tuple2;
-
-
-	function getWidth()
-	{
-		return localRuntime.node.clientWidth;
-	}
-
-
-	function getHeight()
-	{
-		if (localRuntime.isFullscreen())
-		{
-			return window.innerHeight;
-		}
-		return localRuntime.node.clientHeight;
-	}
-
-
-	var dimensions = NS.input('Window.dimensions', Tuple2(getWidth(), getHeight()));
-
-
-	function resizeIfNeeded()
-	{
-		// Do not trigger event if the dimensions have not changed.
-		// This should be most of the time.
-		var w = getWidth();
-		var h = getHeight();
-		if (dimensions.value._0 === w && dimensions.value._1 === h)
-		{
-			return;
-		}
-
-		setTimeout(function() {
-			// Check again to see if the dimensions have changed.
-			// It is conceivable that the dimensions have changed
-			// again while some other event was being processed.
-			w = getWidth();
-			h = getHeight();
-			if (dimensions.value._0 === w && dimensions.value._1 === h)
-			{
-				return;
-			}
-			localRuntime.notify(dimensions.id, Tuple2(w, h));
-		}, 0);
-	}
-
-
-	localRuntime.addListener([dimensions.id], window, 'resize', resizeIfNeeded);
-
-
-	return localRuntime.Native.Window.values = {
-		dimensions: dimensions,
-		resizeIfNeeded: resizeIfNeeded
-	};
-};
-Elm.Window = Elm.Window || {};
-Elm.Window.make = function (_elm) {
-   "use strict";
-   _elm.Window = _elm.Window || {};
-   if (_elm.Window.values) return _elm.Window.values;
-   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Native$Window = Elm.Native.Window.make(_elm),$Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var dimensions = $Native$Window.dimensions;
-   var width = A2($Signal.map,$Basics.fst,dimensions);
-   var height = A2($Signal.map,$Basics.snd,dimensions);
-   return _elm.Window.values = {_op: _op,dimensions: dimensions,width: width,height: height};
 };Elm.Object = Elm.Object || {};
 Elm.Object.make = function (_elm) {
    "use strict";
@@ -9493,66 +9258,17 @@ Elm.Ball.make = function (_elm) {
       ,vx: A3(stepV,_p1.vx,_U.cmp(_p3,7 - $Constants.halfWidth) < 0,_U.cmp(_p3,$Constants.halfWidth - 7) > 0)}));
    });
    return _elm.Ball.values = {_op: _op,stepBall: stepBall,stepV: stepV,near: near,within: within};
-};Elm.Bricks = Elm.Bricks || {};
-Elm.Bricks.make = function (_elm) {
+};Elm.BallTest = Elm.BallTest || {};
+Elm.BallTest.make = function (_elm) {
    "use strict";
-   _elm.Bricks = _elm.Bricks || {};
-   if (_elm.Bricks.values) return _elm.Bricks.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Constants = Elm.Constants.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Object = Elm.Object.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var displayBricks = F2(function (bricks,shapes) {
-      var brickColors = A2($List.map,function (_) {    return _.color;},bricks);
-      return A4($List.map3,$Object.displayObj,bricks,shapes,brickColors);
-   });
-   var firstBrick = _U.list([{x: 21 - $Constants.halfWidth,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green}]);
-   var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
-   var initBrick = makeBrick(31 - $Constants.halfWidth);
-   var newBricks = A2($List._op["::"],initBrick,_U.list([]));
-   var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {
-      createSubsequentBricks: while (true) {
-         var num = numberOfBricksLeft - 1;
-         var nextBrick = makeBrick(brick.x + 31);
-         var newBricks = A2($List._op["::"],nextBrick,bricks);
-         if (_U.eq(numberOfBricksLeft,0)) return bricks; else {
-               var _v0 = num,_v1 = nextBrick,_v2 = newBricks;
-               numberOfBricksLeft = _v0;
-               brick = _v1;
-               bricks = _v2;
-               continue createSubsequentBricks;
-            }
-      }
-   });
-   var createBricks = A3(createSubsequentBricks,10,initBrick,newBricks);
-   return _elm.Bricks.values = {_op: _op
-                               ,makeBrick: makeBrick
-                               ,firstBrick: firstBrick
-                               ,initBrick: initBrick
-                               ,newBricks: newBricks
-                               ,createBricks: createBricks
-                               ,createSubsequentBricks: createSubsequentBricks
-                               ,displayBricks: displayBricks};
-};Elm.Game = Elm.Game || {};
-Elm.Game.make = function (_elm) {
-   "use strict";
-   _elm.Game = _elm.Game || {};
-   if (_elm.Game.values) return _elm.Game.values;
+   _elm.BallTest = _elm.BallTest || {};
+   if (_elm.BallTest.values) return _elm.BallTest.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Ball = Elm.Ball.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Bricks = Elm.Bricks.make(_elm),
-   $Constants = Elm.Constants.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Keyboard = Elm.Keyboard.make(_elm),
+   $ElmTest = Elm.ElmTest.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Player = Elm.Player.make(_elm),
@@ -9560,109 +9276,28 @@ Elm.Game.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Time = Elm.Time.make(_elm);
    var _op = {};
-   var updateGame = F2(function (game,player_lcl) {    return _U.update(game,{player: player_lcl});});
+   var stepV = A3($Ball.stepV,-1.0,true,true);
+   var ball = {x: 399,y: -185,vy: 0.0,vx: 0.0};
+   var player = {x: 400,y: -190,vy: 0.0,vx: 0.0,score: 0};
+   var testWithin = A2($Ball.within,ball,player);
+   var stepBall = A3($Ball.stepBall,1.0,ball,player);
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
-   var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
-   var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
-   var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
-   var Pause = {ctor: "Pause"};
-   var stepGame = F2(function (input,game) {
-      var _p0 = game;
-      var ball = _p0.ball;
-      var state = _p0.state;
-      var player = _p0.player;
-      var _p1 = input;
-      var paddle = _p1.paddle;
-      var delta = _p1.delta;
-      var player$ = A3($Player.stepPlayer,delta,paddle,player);
-      var ball$ = _U.eq(state,Pause) ? ball : A3($Ball.stepBall,delta,ball,player);
-      return _U.update(game,{player: player$,ball: ball$});
-   });
-   var Play = {ctor: "Play"};
-   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
-   var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
-   return _elm.Game.values = {_op: _op
-                             ,Play: Play
-                             ,Pause: Pause
-                             ,Input: Input
-                             ,Game: Game
-                             ,delta: delta
-                             ,defaultGame: defaultGame
-                             ,input: input
-                             ,updateGame: updateGame
-                             ,stepGame: stepGame
-                             ,gameState: gameState};
-};Elm.Breakout = Elm.Breakout || {};
-Elm.Breakout.make = function (_elm) {
-   "use strict";
-   _elm.Breakout = _elm.Breakout || {};
-   if (_elm.Breakout.values) return _elm.Breakout.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Bricks = Elm.Bricks.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Constants = Elm.Constants.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Game = Elm.Game.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Object = Elm.Object.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Text = Elm.Text.make(_elm),
-   $Window = Elm.Window.make(_elm);
-   var _op = {};
-   var txt = function (f) {
-      return function (_p0) {
-         return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,$Constants.textIvory,$Text.fromString(_p0)))));
-      };
-   };
-   var display = F2(function (_p2,_p1) {
-      var _p3 = _p2;
-      var _p4 = _p1;
-      var _p5 = _p4.ball;
-      var shapes = A3($Object.createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
-      var brickDisplay = A2($Bricks.displayBricks,_p4.bricks,shapes);
-      var displayObjects = A2($List.append,
-      _U.list([A2($Graphics$Collage.filled,$Constants.breakoutCharcoal,A2($Graphics$Collage.rect,$Constants.gameWidth,$Constants.gameHeight))
-              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.oval,15,15),$Color.white)
-              ,A3($Object.displayObj,_p4.player,A2($Graphics$Collage.rect,40,10),$Color.white)]),
-      brickDisplay);
-      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.y));
-      return A4($Graphics$Element.container,
-      _p3._0,
-      _p3._1,
-      $Graphics$Element.middle,
-      A3($Graphics$Collage.collage,$Constants.gameWidth,$Constants.gameHeight,displayObjects));
-   });
-   var main = A3($Signal.map2,display,$Window.dimensions,$Game.gameState);
-   return _elm.Breakout.values = {_op: _op,txt: txt,display: display,main: main};
-};Elm.BreakoutTest = Elm.BreakoutTest || {};
-Elm.BreakoutTest.make = function (_elm) {
-   "use strict";
-   _elm.BreakoutTest = _elm.BreakoutTest || {};
-   if (_elm.BreakoutTest.values) return _elm.BreakoutTest.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Breakout = Elm.Breakout.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest = Elm.ElmTest.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var bricks = _U.list([{x: 21 - $Breakout.halfWidth,y: $Breakout.halfHeight - 7,vy: 0,vx: 0,color: $Color.green}]);
-   var d = A2($Breakout.displayBricks,bricks,_U.list([A2($Graphics$Collage.rect,40,10)]));
+   var testNear = A3($Ball.near,2.0,1.0,2.0);
    var tests = A2($ElmTest.suite,
    "A Test Suite",
-   _U.list([A2($ElmTest.test,"createBricks",A2($ElmTest.assertEqual,$Breakout.createBricks,_U.list([])))
-           ,A2($ElmTest.test,"displayBricks",A2($ElmTest.assertEqual,d,_U.list([])))]));
+   _U.list([A2($ElmTest.test,"near",A2($ElmTest.assertEqual,testNear,true))
+           ,A2($ElmTest.test,"within",A2($ElmTest.assertEqual,testWithin,true))
+           ,A2($ElmTest.test,"stepV",A2($ElmTest.assertEqual,stepV,1.0))
+           ,A2($ElmTest.test,"stepBall",A2($ElmTest.assertEqual,stepBall,ball))]));
    var main = $ElmTest.elementRunner(tests);
-   return _elm.BreakoutTest.values = {_op: _op,bricks: bricks,d: d,tests: tests,main: main};
-};</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.BreakoutTest)</script></body></html>
+   return _elm.BallTest.values = {_op: _op
+                                 ,testNear: testNear
+                                 ,delta: delta
+                                 ,player: player
+                                 ,ball: ball
+                                 ,testWithin: testWithin
+                                 ,stepV: stepV
+                                 ,stepBall: stepBall
+                                 ,tests: tests
+                                 ,main: main};
+};</script></head><body><script type="text/javascript">Elm.fullscreen(Elm.BallTest)</script></body></html>
