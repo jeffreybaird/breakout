@@ -11,15 +11,8 @@ Elm.Player.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Object = Elm.Object.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var stepPlayer = F3(function (time,direction,player) {
-      var score$ = player.score + 1;
-      var player$ = A2($Object.stepObj,time,_U.update(player,{vx: $Basics.toFloat(direction) * 300}));
-      var x$ = A3($Basics.clamp,22 - $Constants.halfWidth,$Constants.halfWidth - 22,player$.x);
-      return _U.update(player$,{x: x$,score: score$});
-   });
    var makePlayer = function (x) {    return {x: x,y: 10 - $Constants.halfHeight,vy: 0.0,vx: 0.0,score: 0};};
-   return _elm.Player.values = {_op: _op,makePlayer: makePlayer,stepPlayer: stepPlayer};
+   return _elm.Player.values = {_op: _op,makePlayer: makePlayer};
 };

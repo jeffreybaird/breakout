@@ -6,6 +6,7 @@ import Ball exposing (near, within, withinBrick)
 import Player exposing (..)
 import Bricks
 import Color
+import Game
 
 testNear : Bool
 testNear = near 2.0 1.0 2.0
@@ -36,7 +37,7 @@ stepV =
 
 stepBall: Ball.Ball
 stepBall =
-  Ball.stepBall 1.0 ball player
+  Game.stepBall 1.0 ball player [brick]
 
 withinBrick : Bool
 withinBrick =

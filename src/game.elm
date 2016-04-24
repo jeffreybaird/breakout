@@ -47,8 +47,11 @@ stepObj t ({x,y,vx,vy} as obj) =
 stepBricks : Time.Time -> Bricks -> Ball -> Bricks
 stepBricks time bricks ball =
   let
+    xy : Brick -> List Float
+    xy brick =
+      [brick.x, brick.y]
     brs = Debug.watch "Bricks" (List.map (withinBrick ball) bricks)
-    br = Debug.watch "Bricks X" (List.map .x bricks)
+    br = Debug.watch "Bricks X,Y" (List.map xy bricks) 
   in
     List.map (stepBrick time ball) bricks
 
@@ -91,6 +94,16 @@ stepBall time ({x,y,vx,vy} as ball) player bricks =
             vx =
               stepV vx (x < 7-halfWidth) (x > halfWidth-7)
         }
+
+stepPlayer : Time.Time -> Int -> Player -> Player
+stepPlayer time direction player =
+    let player' = stepObj time { player | vx = toFloat direction* 300 }
+        x'      = clamp (22-halfWidth) (halfWidth-22) player'.x
+        score'  = player.score + 1
+
+    in
+      { player' | x = x', score = score' }
+
 
 stepGame : Input -> Game -> Game
 stepGame input game =

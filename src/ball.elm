@@ -16,7 +16,7 @@ isTrue x =
 
 withinBrick : Ball -> Brick -> Bool
 withinBrick ball brick =
-  near ball.x 12 brick.x && near ball.y 20 brick.y
+  near ball.x 30 brick.x && near ball.y 16 brick.y
 
 
 ballWithinBricks : Ball -> Bricks -> Bool
