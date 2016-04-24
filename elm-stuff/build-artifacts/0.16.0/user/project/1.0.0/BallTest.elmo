@@ -6,6 +6,8 @@ Elm.BallTest.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Ball = Elm.Ball.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
+   $Color = Elm.Color.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $ElmTest = Elm.ElmTest.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
@@ -17,7 +19,10 @@ Elm.BallTest.make = function (_elm) {
    $Time = Elm.Time.make(_elm);
    var _op = {};
    var stepV = A3($Ball.stepV,-1.0,true,true);
+   var brick = {x: 400,y: -190,vy: 0.0,vx: 0.0,color: $Color.blue};
    var ball = {x: 399,y: -185,vy: 0.0,vx: 0.0};
+   var testWithinBricks = A2($Ball.ballWithinBricks,ball,_U.list([brick]));
+   var withinBrick = A2($Ball.withinBrick,ball,brick);
    var player = {x: 400,y: -190,vy: 0.0,vx: 0.0,score: 0};
    var testWithin = A2($Ball.within,ball,player);
    var stepBall = A3($Ball.stepBall,1.0,ball,player);
@@ -28,16 +33,21 @@ Elm.BallTest.make = function (_elm) {
    _U.list([A2($ElmTest.test,"near",A2($ElmTest.assertEqual,testNear,true))
            ,A2($ElmTest.test,"within",A2($ElmTest.assertEqual,testWithin,true))
            ,A2($ElmTest.test,"stepV",A2($ElmTest.assertEqual,stepV,1.0))
-           ,A2($ElmTest.test,"stepBall",A2($ElmTest.assertEqual,stepBall,ball))]));
+           ,A2($ElmTest.test,"stepBall",A2($ElmTest.assertEqual,stepBall,ball))
+           ,A2($ElmTest.test,"withinBrick",A2($ElmTest.assertEqual,withinBrick,true))
+           ,A2($ElmTest.test,"withinBricks",A2($ElmTest.assertEqual,testWithinBricks,true))]));
    var main = $ElmTest.elementRunner(tests);
    return _elm.BallTest.values = {_op: _op
                                  ,testNear: testNear
                                  ,delta: delta
                                  ,player: player
                                  ,ball: ball
+                                 ,brick: brick
+                                 ,testWithinBricks: testWithinBricks
                                  ,testWithin: testWithin
                                  ,stepV: stepV
                                  ,stepBall: stepBall
+                                 ,withinBrick: withinBrick
                                  ,tests: tests
                                  ,main: main};
 };

@@ -2,8 +2,10 @@ module BallTest where
 import ElmTest exposing (..)
 import Graphics.Element exposing (..)
 import Time
-import Ball exposing (near, within)
+import Ball exposing (near, within, withinBrick)
 import Player exposing (..)
+import Bricks
+import Color
 
 testNear : Bool
 testNear = near 2.0 1.0 2.0
@@ -17,6 +19,14 @@ player ={x=400, y=-190, vy=0.0, vx=0.0,score=0}
 ball : Ball.Ball
 ball = {x=399, y=-185, vy=0.0, vx=0.0}
 
+brick : Bricks.Brick
+brick = {x=400, y=-190, vy=0.0, vx=0.0,color=Color.blue}
+
+
+testWithinBricks : Bool
+testWithinBricks =
+  Ball.ballWithinBricks ball [brick]
+
 testWithin : Bool
 testWithin = within ball player
 
@@ -28,6 +38,10 @@ stepBall: Ball.Ball
 stepBall =
   Ball.stepBall 1.0 ball player
 
+withinBrick : Bool
+withinBrick =
+  Ball.withinBrick ball brick
+
 
 
 tests : Test
@@ -37,6 +51,8 @@ tests =
             , test "within" (assertEqual testWithin True)
             , test "stepV" (assertEqual stepV 1.0)
             , test "stepBall" (assertEqual stepBall ball)
+            , test "withinBrick" (assertEqual withinBrick True)
+            , test "withinBricks" (assertEqual testWithinBricks True)
             ]
 
 main : Element

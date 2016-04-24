@@ -6,37 +6,38 @@ import Graphics.Collage exposing (..)
 import Constants exposing(..)
 
 
+
 type alias Brick =
   Object {color : Color.Color}
 
 type alias Bricks = List Brick
 
 
+
+
 makeBrick : Float -> Brick
 makeBrick x =
   {x=x, y=halfHeight-7, vy=0, vx = 0, color=Color.green}
 
-firstBrick : Bricks
-firstBrick =
-  [{x=21-halfWidth, y=halfHeight-7, vy=0, vx = 0, color = Color.green}]
-
-
 initBrick: Brick
-initBrick = makeBrick(31-halfWidth)
+initBrick = makeBrick(35-halfWidth)
 
 newBricks: Bricks
 newBricks = initBrick :: []
 
+numberOfBricks : Int
+numberOfBricks =
+  floor (((toFloat gameWidth) / 60.0) - 2)
 
 createBricks : Bricks
 createBricks  =
-  createSubsequentBricks 10 initBrick newBricks
+  createSubsequentBricks numberOfBricks initBrick newBricks
 
 createSubsequentBricks : Int -> Brick -> Bricks -> Bricks
 createSubsequentBricks numberOfBricksLeft brick bricks =
   let
     nextBrick: Brick
-    nextBrick = makeBrick(brick.x + 31)
+    nextBrick = makeBrick(brick.x + 66)
 
     newBricks: Bricks
     newBricks = nextBrick :: bricks
@@ -48,10 +49,15 @@ createSubsequentBricks numberOfBricksLeft brick bricks =
     else
       createSubsequentBricks num nextBrick newBricks
 
+
+displayBrick : Brick -> Form
+displayBrick brick =
+  displayObj brick (rect 65 10) brick.color
+
 displayBricks : Bricks -> List Shape -> List Form
 displayBricks bricks shapes =
   let
     brickColors : List Color.Color
     brickColors = List.map .color bricks
   in
-    List.map3 displayObj bricks shapes brickColors
+    List.map displayBrick bricks

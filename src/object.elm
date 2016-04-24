@@ -2,7 +2,6 @@ module Object where
 
 import Graphics.Collage exposing (..)
 import Color
-import Time
 
 type alias Object a =
   { a |
@@ -12,12 +11,7 @@ type alias Object a =
     , vy : Float
   }
 
-stepObj : Time.Time -> Object a -> Object a
-stepObj t ({x,y,vx,vy} as obj) =
-    { obj |
-        x = x + vx * t,
-        y = y + vy * t
-    }
+
 
 
 displayObj : Object a -> Shape -> Color.Color -> Form

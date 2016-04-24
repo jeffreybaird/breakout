@@ -1,23 +1,29 @@
 module Ball where
 
 import Object exposing (..)
-import Time
 import Player exposing (..)
-import Constants exposing (..)
+import Bricks exposing (..)
 
 
 type alias Ball =
   Object {}
 
-stepBall : Time.Time -> Ball -> Player -> Ball
-stepBall time ({x,y,vx,vy} as ball) player =
-      stepObj time
-          { ball |
-            vy =
-              stepV vy (ball `within` player) (y > halfHeight - 7),
-            vx =
-              stepV vx (x < 7-halfWidth) (x > halfWidth-7)
-        }
+
+
+isTrue : Bool -> Bool
+isTrue x =
+  x == True
+
+withinBrick : Ball -> Brick -> Bool
+withinBrick ball brick =
+  near ball.x 12 brick.x && near ball.y 20 brick.y
+
+
+ballWithinBricks : Ball -> Bricks -> Bool
+ballWithinBricks  ball bricks=
+  List.any isTrue <|
+    List.map (withinBrick ball) bricks
+
 
 stepV : Float -> Bool -> Bool -> Float
 stepV v lowerCollision upperCollision =

@@ -5,6 +5,8 @@ import Player exposing (..)
 import Bricks exposing (..)
 import Constants exposing (..)
 import Keyboard
+import Object exposing (..)
+import Time
 
 type State = Play | Pause
 
@@ -26,6 +28,39 @@ type alias Game =
 delta : Signal Time.Time
 delta = Signal.map Time.inSeconds (Time.fps 35)
 
+remove : Brick -> Ball -> Float
+remove brick ball =
+  let
+   b = Debug.watch "Ball" [ball.x, ball.y]
+   br = Debug.watch "Brick" [brick.x, brick.y]
+  in
+    if withinBrick ball brick then 1000.0 - gameHeight
+    else brick.x
+
+stepObj : Time.Time -> Object a -> Object a
+stepObj t ({x,y,vx,vy} as obj) =
+    { obj |
+        x = x + vx * t,
+        y = y + vy * t
+    }
+
+stepBricks : Time.Time -> Bricks -> Ball -> Bricks
+stepBricks time bricks ball =
+  let
+    brs = Debug.watch "Bricks" (List.map (withinBrick ball) bricks)
+    br = Debug.watch "Bricks X" (List.map .x bricks)
+  in
+    List.map (stepBrick time ball) bricks
+
+
+stepBrick : Time.Time -> Ball -> Brick -> Brick
+stepBrick time ball ({x,y,vx,vy} as brick) =
+  stepObj time
+    { brick |
+      x =
+        remove brick ball
+  }
+
 defaultGame : Game
 defaultGame =
     {
@@ -43,22 +78,31 @@ input =
       delta
 
 -- Update
-
-updateGame : Game -> Player -> Game
-updateGame game player_lcl =
-  {game | player = player_lcl}
-
+stepBall : Time.Time -> Ball -> Player -> Bricks -> Ball
+stepBall time ({x,y,vx,vy} as ball) player bricks =
+  let
+    bwb = List.any isTrue <| List.map (withinBrick ball) bricks
+    d = Debug.watch "BWB" bwb
+  in
+    stepObj time
+          { ball |
+            vy =
+              stepV vy (ball `within` player)((y > halfHeight - 7)|| bwb ),
+            vx =
+              stepV vx (x < 7-halfWidth) (x > halfWidth-7)
+        }
 
 stepGame : Input -> Game -> Game
 stepGame input game =
   let
     {paddle,delta} = input
-    {ball, state,player} = game
+    {ball, state,player, bricks} = game
+    bricks' = stepBricks delta bricks ball
     player' = stepPlayer delta paddle player
     ball' =
         if state == Pause
             then ball
-            else stepBall delta ball player
+            else stepBall delta ball player bricks
   in
     {game | player = player', ball = ball'}
 

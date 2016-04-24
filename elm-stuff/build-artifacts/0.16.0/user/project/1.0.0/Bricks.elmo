@@ -15,18 +15,19 @@ Elm.Bricks.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var displayBrick = function (brick) {    return A3($Object.displayObj,brick,A2($Graphics$Collage.rect,65,10),brick.color);};
    var displayBricks = F2(function (bricks,shapes) {
       var brickColors = A2($List.map,function (_) {    return _.color;},bricks);
-      return A4($List.map3,$Object.displayObj,bricks,shapes,brickColors);
+      return A2($List.map,displayBrick,bricks);
    });
-   var firstBrick = _U.list([{x: 21 - $Constants.halfWidth,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green}]);
+   var numberOfBricks = $Basics.floor($Basics.toFloat($Constants.gameWidth) / 60.0 - 2);
    var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
-   var initBrick = makeBrick(31 - $Constants.halfWidth);
+   var initBrick = makeBrick(35 - $Constants.halfWidth);
    var newBricks = A2($List._op["::"],initBrick,_U.list([]));
    var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {
       createSubsequentBricks: while (true) {
          var num = numberOfBricksLeft - 1;
-         var nextBrick = makeBrick(brick.x + 31);
+         var nextBrick = makeBrick(brick.x + 66);
          var newBricks = A2($List._op["::"],nextBrick,bricks);
          if (_U.eq(numberOfBricksLeft,0)) return bricks; else {
                var _v0 = num,_v1 = nextBrick,_v2 = newBricks;
@@ -37,13 +38,14 @@ Elm.Bricks.make = function (_elm) {
             }
       }
    });
-   var createBricks = A3(createSubsequentBricks,10,initBrick,newBricks);
+   var createBricks = A3(createSubsequentBricks,numberOfBricks,initBrick,newBricks);
    return _elm.Bricks.values = {_op: _op
                                ,makeBrick: makeBrick
-                               ,firstBrick: firstBrick
                                ,initBrick: initBrick
                                ,newBricks: newBricks
+                               ,numberOfBricks: numberOfBricks
                                ,createBricks: createBricks
                                ,createSubsequentBricks: createSubsequentBricks
+                               ,displayBrick: displayBrick
                                ,displayBricks: displayBricks};
 };
