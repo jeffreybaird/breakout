@@ -6952,13 +6952,18 @@ Elm.Bricks.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var displayBrick = function (brick) {    return A3($Object.displayObj,brick,A2($Graphics$Collage.rect,65,10),brick.color);};
+   var displayBrick = function (brick) {
+      return brick.hit ? A3($Object.displayObj,brick,A2($Graphics$Collage.rect,0,0),brick.color) : A3($Object.displayObj,
+      brick,
+      A2($Graphics$Collage.rect,65,10),
+      brick.color);
+   };
    var displayBricks = F2(function (bricks,shapes) {
       var brickColors = A2($List.map,function (_) {    return _.color;},bricks);
       return A2($List.map,displayBrick,bricks);
    });
    var numberOfBricks = $Basics.floor($Basics.toFloat($Constants.gameWidth) / 60.0 - 2);
-   var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
+   var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green,hit: false};};
    var initBrick = makeBrick(35 - $Constants.halfWidth);
    var newBricks = A2($List._op["::"],initBrick,_U.list([]));
    var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {
@@ -7049,17 +7054,18 @@ Elm.Game.make = function (_elm) {
       var x$ = A3($Basics.clamp,22 - $Constants.halfWidth,$Constants.halfWidth - 22,player$.x);
       return _U.update(player$,{x: x$,score: score$});
    });
-   var remove = F2(function (brick,ball) {
-      var br = A2($Debug.watch,"Brick",_U.list([brick.x,brick.y]));
+   var move = function (brick) {    return brick.hit ? $Constants.gameHeight + 1000 : brick.x;};
+   var remove = F2(function (ball,brick) {
       var b = A2($Debug.watch,"Ball",_U.list([ball.x,ball.y]));
-      return A2($Ball.withinBrick,ball,brick) ? 1000.0 - $Constants.gameHeight : brick.x;
+      return A2($Ball.withinBrick,ball,brick) ? true : brick.hit;
    });
-   var stepBrick = F3(function (time,ball,_p6) {    var _p7 = _p6;var _p8 = _p7;return A2(stepObj,time,_U.update(_p8,{x: A2(remove,_p8,ball)}));});
-   var stepBricks = F3(function (time,bricks,ball) {
-      var brs = A2($Debug.watch,"Bricks",A2($List.map,$Ball.withinBrick(ball),bricks));
+   var stepBrick = F2(function (ball,brick) {    return _U.update(brick,{hit: A2(remove,ball,brick),x: move(brick)});});
+   var stepBricks = F2(function (bricks,ball) {
+      var a = A2($Debug.watch,"Hit",A2($List.map,remove(ball),bricks));
+      var b = A2($Debug.watch,"Ball Within Bricks",A2($List.map,$Ball.withinBrick(ball),bricks));
+      var brs = A2($Debug.watch,"Bricks Hit",A2($List.map,function (_) {    return _.hit;},bricks));
       var xy = function (brick) {    return _U.list([brick.x,brick.y]);};
-      var br = A2($Debug.watch,"Bricks X,Y",A2($List.map,xy,bricks));
-      return A2($List.map,A2(stepBrick,time,ball),bricks);
+      return A2($List.map,stepBrick(ball),bricks);
    });
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
    var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
@@ -7067,18 +7073,18 @@ Elm.Game.make = function (_elm) {
    var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
    var Pause = {ctor: "Pause"};
    var stepGame = F2(function (input,game) {
-      var _p9 = game;
-      var ball = _p9.ball;
-      var state = _p9.state;
-      var player = _p9.player;
-      var bricks = _p9.bricks;
-      var _p10 = input;
-      var paddle = _p10.paddle;
-      var delta = _p10.delta;
-      var bricks$ = A3(stepBricks,delta,bricks,ball);
+      var _p6 = game;
+      var ball = _p6.ball;
+      var state = _p6.state;
+      var player = _p6.player;
+      var bricks = _p6.bricks;
+      var bricks$ = A2(stepBricks,bricks,ball);
+      var _p7 = input;
+      var paddle = _p7.paddle;
+      var delta = _p7.delta;
       var player$ = A3(stepPlayer,delta,paddle,player);
       var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player,bricks);
-      return _U.update(game,{player: player$,ball: ball$});
+      return _U.update(game,{player: player$,ball: ball$,bricks: bricks$});
    });
    var Play = {ctor: "Play"};
    var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
@@ -7090,6 +7096,7 @@ Elm.Game.make = function (_elm) {
                              ,Game: Game
                              ,delta: delta
                              ,remove: remove
+                             ,move: move
                              ,stepObj: stepObj
                              ,stepBricks: stepBricks
                              ,stepBrick: stepBrick

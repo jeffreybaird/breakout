@@ -28,14 +28,18 @@ type alias Game =
 delta : Signal Time.Time
 delta = Signal.map Time.inSeconds (Time.fps 35)
 
-remove : Brick -> Ball -> Float
-remove brick ball =
+remove :Ball -> Brick -> Bool
+remove ball brick =
   let
    b = Debug.watch "Ball" [ball.x, ball.y]
-   br = Debug.watch "Brick" [brick.x, brick.y]
   in
-    if withinBrick ball brick then 1000.0 - gameHeight
-    else brick.x
+    if withinBrick ball brick then True
+    else brick.hit
+
+move: Brick -> Float
+move brick =
+  if brick.hit then gameHeight + 1000
+  else brick.x
 
 stepObj : Time.Time -> Object a -> Object a
 stepObj t ({x,y,vx,vy} as obj) =
@@ -44,25 +48,22 @@ stepObj t ({x,y,vx,vy} as obj) =
         y = y + vy * t
     }
 
-stepBricks : Time.Time -> Bricks -> Ball -> Bricks
-stepBricks time bricks ball =
+stepBricks : Bricks -> Ball -> Bricks
+stepBricks bricks ball =
   let
     xy : Brick -> List Float
     xy brick =
       [brick.x, brick.y]
-    brs = Debug.watch "Bricks" (List.map (withinBrick ball) bricks)
-    br = Debug.watch "Bricks X,Y" (List.map xy bricks)
+    brs = Debug.watch "Bricks Hit" (List.map .hit bricks)
+    b = Debug.watch "Ball Within Bricks" (List.map (withinBrick ball ) bricks)
+    a = Debug.watch "Hit" (List.map (remove ball) bricks)
   in
-    List.map (stepBrick time ball) bricks
+    List.map (stepBrick ball) bricks
 
 
-stepBrick : Time.Time -> Ball -> Brick -> Brick
-stepBrick time ball ({x,y,vx,vy} as brick) =
-  stepObj time
-    { brick |
-      x =
-        remove brick ball
-  }
+stepBrick : Ball -> Brick -> Brick
+stepBrick ball brick =
+  { brick | hit = (remove ball brick), x = (move brick)}
 
 defaultGame : Game
 defaultGame =
@@ -110,14 +111,14 @@ stepGame input game =
   let
     {paddle,delta} = input
     {ball, state,player, bricks} = game
-    bricks' = stepBricks delta bricks ball
+    bricks' = stepBricks bricks ball
     player' = stepPlayer delta paddle player
     ball' =
         if state == Pause
             then ball
             else stepBall delta ball player bricks
   in
-    {game | player = player', ball = ball'}
+    {game | player = player', ball = ball', bricks = bricks'}
 
 gameState : Signal Game
 gameState =

@@ -15,13 +15,18 @@ Elm.Bricks.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var displayBrick = function (brick) {    return A3($Object.displayObj,brick,A2($Graphics$Collage.rect,65,10),brick.color);};
+   var displayBrick = function (brick) {
+      return brick.hit ? A3($Object.displayObj,brick,A2($Graphics$Collage.rect,0,0),brick.color) : A3($Object.displayObj,
+      brick,
+      A2($Graphics$Collage.rect,65,10),
+      brick.color);
+   };
    var displayBricks = F2(function (bricks,shapes) {
       var brickColors = A2($List.map,function (_) {    return _.color;},bricks);
       return A2($List.map,displayBrick,bricks);
    });
    var numberOfBricks = $Basics.floor($Basics.toFloat($Constants.gameWidth) / 60.0 - 2);
-   var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green};};
+   var makeBrick = function (x) {    return {x: x,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green,hit: false};};
    var initBrick = makeBrick(35 - $Constants.halfWidth);
    var newBricks = A2($List._op["::"],initBrick,_U.list([]));
    var createSubsequentBricks = F3(function (numberOfBricksLeft,brick,bricks) {

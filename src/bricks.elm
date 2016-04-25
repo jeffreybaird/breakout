@@ -8,16 +8,14 @@ import Constants exposing(..)
 
 
 type alias Brick =
-  Object {color : Color.Color}
+  Object {color : Color.Color, hit: Bool}
 
 type alias Bricks = List Brick
 
 
-
-
 makeBrick : Float -> Brick
 makeBrick x =
-  {x=x, y=halfHeight-7, vy=0, vx = 0, color=Color.green}
+  {x=x, y=halfHeight-7, vy=0, vx = 0, color=Color.green, hit=False}
 
 initBrick: Brick
 initBrick = makeBrick(35-halfWidth)
@@ -52,7 +50,8 @@ createSubsequentBricks numberOfBricksLeft brick bricks =
 
 displayBrick : Brick -> Form
 displayBrick brick =
-  displayObj brick (rect 65 10) brick.color
+  if brick.hit then displayObj brick (rect 0 0) brick.color
+  else displayObj brick (rect 65 10) brick.color
 
 displayBricks : Bricks -> List Shape -> List Form
 displayBricks bricks shapes =
