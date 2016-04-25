@@ -21,7 +21,7 @@ ball : Ball.Ball
 ball = {x=399, y=-185, vy=0.0, vx=0.0}
 
 brick : Bricks.Brick
-brick = {x=400, y=-190, vy=0.0, vx=0.0,color=Color.blue}
+brick = {x=400, y=-190, vy=0.0, vx=0.0,color=Color.blue, hit=False}
 
 
 testWithinBricks : Bool

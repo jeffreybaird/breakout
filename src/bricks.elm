@@ -13,19 +13,19 @@ type alias Brick =
 type alias Bricks = List Brick
 
 
-makeBrick : Float -> Brick
-makeBrick x =
-  {x=x, y=halfHeight-7, vy=0, vx = 0, color=Color.green, hit=False}
+makeBrick : Float -> Float -> Brick
+makeBrick x y  =
+  {x=x, y=y, vy=0, vx = 0, color=Color.green, hit=False}
 
 initBrick: Brick
-initBrick = makeBrick(35-halfWidth)
+initBrick = makeBrick (35-halfWidth) (halfHeight-7)
 
 newBricks: Bricks
 newBricks = initBrick :: []
 
 numberOfBricks : Int
 numberOfBricks =
-  floor (((toFloat gameWidth) / 60.0) - 2)
+  floor (((((toFloat gameWidth) / 60.0) - 1) * 4) - 1)
 
 createBricks : Bricks
 createBricks  =
@@ -35,7 +35,11 @@ createSubsequentBricks : Int -> Brick -> Bricks -> Bricks
 createSubsequentBricks numberOfBricksLeft brick bricks =
   let
     nextBrick: Brick
-    nextBrick = makeBrick(brick.x + 66)
+    nextBrick =
+      if (brick.x + 66) > (halfWidth - 35) then
+        makeBrick(35 - halfWidth) (brick.y - 11)
+      else
+        makeBrick(brick.x + 66) brick.y
 
     newBricks: Bricks
     newBricks = nextBrick :: bricks
