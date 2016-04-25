@@ -134,7 +134,7 @@ stepGame input game =
         else if outOfPlayArea ball then Pause
         else state
     resetGame =
-      if outOfPlayArea ball then True
+      if (space && (outOfPlayArea ball) ) then True
       else False
   in
     if resetGame then defaultGame

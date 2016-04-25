@@ -9,6 +9,7 @@ import Object exposing (..)
 import Constants exposing (..)
 import Bricks exposing (..)
 import Game exposing (..)
+import String
 
 -- View
 
@@ -20,8 +21,20 @@ display : (Int, Int) -> Game -> Graphics.Element.Element
 display (w,h) {ball,state,player, bricks} =
     let scores : Graphics.Element.Element
         scores =
+          if outOfPlayArea ball then txt (Text.height 0) ""
+          else
             toString player.score
               |> txt (Text.height 50)
+
+        gameOverText : Graphics.Element.Element
+        gameOverText =
+          if outOfPlayArea ball then
+            String.join "" ["Game Over  ", (toString player.score)]
+              |> txt (Text.height 50)
+          else
+            toString ""
+              |> txt (Text.height 0)
+
         shapes : List Shape
         shapes =
           createShapes 10 (rect 60 10) []
@@ -37,6 +50,8 @@ display (w,h) {ball,state,player, bricks} =
           , displayObj player (rect 40 10) Color.white
           , toForm scores
            |> move (-20, 0)
+          , toForm gameOverText
+            |> move (-40,0)
           ] brickDisplay
 
     in

@@ -7044,7 +7044,6 @@ Elm.Game.make = function (_elm) {
       var player = _p6.player;
       var bricks = _p6.bricks;
       var bricks$ = A2(stepBricks,bricks,ball);
-      var resetGame = outOfPlayArea(ball) ? true : false;
       var _p7 = input;
       var space = _p7.space;
       var paddle = _p7.paddle;
@@ -7052,6 +7051,7 @@ Elm.Game.make = function (_elm) {
       var player$ = A4(stepPlayer,delta,paddle,player,bricks);
       var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player,bricks);
       var state$ = space ? Play : outOfPlayArea(ball) ? Pause : state;
+      var resetGame = space && outOfPlayArea(ball) ? true : false;
       return resetGame ? defaultGame : _U.update(game,{player: player$,ball: ball$,bricks: bricks$,state: state$});
    });
    var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
@@ -7092,6 +7092,7 @@ Elm.Breakout.make = function (_elm) {
    $Object = Elm.Object.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
    $Text = Elm.Text.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
@@ -7103,15 +7104,20 @@ Elm.Breakout.make = function (_elm) {
    var display = F2(function (_p2,_p1) {
       var _p3 = _p2;
       var _p4 = _p1;
-      var _p5 = _p4.player;
+      var _p6 = _p4.player;
+      var _p5 = _p4.ball;
       var shapes = A3($Object.createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
       var brickDisplay = A2($Bricks.displayBricks,_p4.bricks,shapes);
-      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.score));
+      var gameOverText = $Game.outOfPlayArea(_p5) ? A2(txt,$Text.height(50),A2($String.join,"",_U.list(["Game Over  ",$Basics.toString(_p6.score)]))) : A2(txt,
+      $Text.height(0),
+      $Basics.toString(""));
+      var scores = $Game.outOfPlayArea(_p5) ? A2(txt,$Text.height(0),"") : A2(txt,$Text.height(50),$Basics.toString(_p6.score));
       var displayObjects = A2($List.append,
       _U.list([A2($Graphics$Collage.filled,$Constants.breakoutCharcoal,A2($Graphics$Collage.rect,$Constants.gameWidth,$Constants.gameHeight))
-              ,A3($Object.displayObj,_p4.ball,A2($Graphics$Collage.oval,15,15),$Color.white)
-              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.rect,40,10),$Color.white)
-              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -20,_1: 0},$Graphics$Collage.toForm(scores))]),
+              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.oval,15,15),$Color.white)
+              ,A3($Object.displayObj,_p6,A2($Graphics$Collage.rect,40,10),$Color.white)
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -20,_1: 0},$Graphics$Collage.toForm(scores))
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: -40,_1: 0},$Graphics$Collage.toForm(gameOverText))]),
       brickDisplay);
       return A4($Graphics$Element.container,
       _p3._0,
