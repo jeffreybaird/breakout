@@ -7084,6 +7084,7 @@ Elm.Game.make = function (_elm) {
       var player = _p6.player;
       var bricks = _p6.bricks;
       var bricks$ = A2(stepBricks,bricks,ball);
+      var resetGame = outOfPlayArea(ball) ? true : false;
       var _p7 = input;
       var space = _p7.space;
       var paddle = _p7.paddle;
@@ -7091,7 +7092,7 @@ Elm.Game.make = function (_elm) {
       var player$ = A3(stepPlayer,delta,paddle,player);
       var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player,bricks);
       var state$ = space ? Play : outOfPlayArea(ball) ? Pause : state;
-      return _U.update(game,{player: player$,ball: ball$,bricks: bricks$,state: state$});
+      return resetGame ? defaultGame : _U.update(game,{player: player$,ball: ball$,bricks: bricks$,state: state$});
    });
    var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
    return _elm.Game.values = {_op: _op

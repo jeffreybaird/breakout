@@ -127,8 +127,13 @@ stepGame input game =
         if space then Play
         else if outOfPlayArea ball then Pause
         else state
+    resetGame =
+      if outOfPlayArea ball then True
+      else False
   in
-    {game | player = player', ball = ball', bricks = bricks', state = state'}
+    if resetGame then defaultGame
+    else
+      {game | player = player', ball = ball', bricks = bricks', state = state'}
 
 gameState : Signal Game
 gameState =

@@ -5,8 +5,6 @@ import Object exposing (..)
 import Graphics.Collage exposing (..)
 import Constants exposing(..)
 
-
-
 type alias Brick =
   Object {color : Color.Color, hit: Bool}
 

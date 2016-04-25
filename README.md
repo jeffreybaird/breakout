@@ -23,9 +23,10 @@ Must have:
 3. ~~Add bricks that the ball bounces off of.~~
 4. ~~Remove bricks when the ball hits the Bricks~~
 5. ~~Multiple rows of bricks~~
-6. Game restarts once the ball goes out of play
+6. ~~Game restarts once the ball goes out of play~~
 7. ~~Game is started with the press of the space bar~~
 8. A method for scoring and displaying the score
+9. "Game Over" is displayed along with the score. Player restarts the game.
 
 Should have:
 
