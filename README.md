@@ -27,6 +27,7 @@ Must have:
 7. ~~Game is started with the press of the space bar~~
 8. A method for scoring and displaying the score
 9. "Game Over" is displayed along with the score. Player restarts the game.
+10. Deployment test
 
 Should have:
 
