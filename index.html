@@ -7033,6 +7033,7 @@ Elm.Game.make = function (_elm) {
    var Input = F2(function (a,b) {    return {paddle: a,delta: b};});
    var input = A2($Signal.sampleOn,delta,A3($Signal.map2,Input,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
    var Pause = {ctor: "Pause"};
+   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Pause,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
    var stepGame = F2(function (input,game) {
       var _p6 = game;
       var ball = _p6.ball;
@@ -7047,9 +7048,8 @@ Elm.Game.make = function (_elm) {
       var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player,bricks);
       return _U.update(game,{player: player$,ball: ball$,bricks: bricks$});
    });
-   var Play = {ctor: "Play"};
-   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Play,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
    var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
+   var Play = {ctor: "Play"};
    return _elm.Game.values = {_op: _op
                              ,Play: Play
                              ,Pause: Pause

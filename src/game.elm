@@ -12,7 +12,8 @@ type State = Play | Pause
 
 type alias Input =
   {
-    paddle : Int
+    space  : Bool
+  , paddle : Int
   , delta  : Time.Time
 }
 
@@ -69,7 +70,7 @@ defaultGame : Game
 defaultGame =
     {
       ball    = {x=0, y=0, vy=-100, vx=100}
-    , state   = Play
+    , state   = Pause
     , player = makePlayer(gameHeight)
     , bricks = createBricks
   }
@@ -77,7 +78,8 @@ defaultGame =
 input : Signal Input
 input =
   Signal.sampleOn delta <|
-    Signal.map2 Input
+    Signal.map3 Input
+      Keyboard.space
       (Signal.map .x Keyboard.arrows)
       delta
 
@@ -105,11 +107,15 @@ stepPlayer time direction player =
     in
       { player' | x = x', score = score' }
 
+outOfPlayArea : Ball -> Bool
+outOfPlayArea ball =
+  if ball.y < 5 - halfHeight then True
+  else False
 
 stepGame : Input -> Game -> Game
 stepGame input game =
   let
-    {paddle,delta} = input
+    {space, paddle,delta} = input
     {ball, state,player, bricks} = game
     bricks' = stepBricks bricks ball
     player' = stepPlayer delta paddle player
@@ -117,8 +123,12 @@ stepGame input game =
         if state == Pause
             then ball
             else stepBall delta ball player bricks
+    state' =
+        if space then Play
+        else if outOfPlayArea ball then Pause
+        else state
   in
-    {game | player = player', ball = ball', bricks = bricks'}
+    {game | player = player', ball = ball', bricks = bricks', state = state'}
 
 gameState : Signal Game
 gameState =

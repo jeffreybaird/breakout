@@ -24,7 +24,7 @@ Must have:
 4. ~~Remove bricks when the ball hits the Bricks~~
 5. ~~Multiple rows of bricks~~
 6. Game restarts once the ball goes out of play
-7. Game is started with the press of the space bar
+7. ~~Game is started with the press of the space bar~~
 8. A method for scoring and displaying the score
 
 Should have:
@@ -41,6 +41,7 @@ Nice to have:
 4. Sounds play when the ball hits the paddle and the bricks
 
 Known Bugs:
+
 1. The ball sometimes goes through the paddle
 2. The ball sometimes goes through the back side of a brick.
 3. The ball sometimes appears to change direction without hitting anything

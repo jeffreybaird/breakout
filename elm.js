@@ -5909,103 +5909,6 @@ Elm.String.make = function (_elm) {
                                ,any: any
                                ,all: all};
 };
-Elm.Console = Elm.Console || {};
-Elm.Console.Core = Elm.Console.Core || {};
-Elm.Console.Core.make = function (_elm) {
-   "use strict";
-   _elm.Console = _elm.Console || {};
-   _elm.Console.Core = _elm.Console.Core || {};
-   if (_elm.Console.Core.values) return _elm.Console.Core.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var Impure = function (a) {    return {ctor: "Impure",_0: a};};
-   var Pure = function (a) {    return {ctor: "Pure",_0: a};};
-   var WriteF = F2(function (a,b) {    return {ctor: "WriteF",_0: a,_1: b};});
-   var Exit = function (a) {    return {ctor: "Exit",_0: a};};
-   var GetC = function (a) {    return {ctor: "GetC",_0: a};};
-   var PutS = F2(function (a,b) {    return {ctor: "PutS",_0: a,_1: b};});
-   var mapF = F2(function (f,iof) {
-      var _p0 = iof;
-      switch (_p0.ctor)
-      {case "PutS": return A2(PutS,_p0._0,function (_p1) {    return f(_p0._1(_p1));});
-         case "GetC": return GetC(function (_p2) {    return f(_p0._0(_p2));});
-         case "Exit": return Exit(_p0._0);
-         default: return A2(WriteF,_p0._0,function (_p3) {    return f(_p0._1(_p3));});}
-   });
-   var andThen = F2(function (io,f) {
-      var _p4 = io;
-      if (_p4.ctor === "Pure") {
-            return f(_p4._0);
-         } else {
-            return Impure(A2(mapF,A2($Basics.flip,andThen,f),_p4._0));
-         }
-   });
-   _op[">>="] = andThen;
-   var seq = F2(function (x,y) {    return A2(_op[">>="],x,function (_p5) {    return y;});});
-   _op[">>>"] = seq;
-   var forever = function (m) {    return A2(_op[">>="],m,function (_p6) {    return forever(m);});};
-   var pure = Pure;
-   var apply = F2(function (iof,iom) {    return A2(_op[">>="],iof,function (f) {    return A2(_op[">>="],iom,function (m) {    return pure(f(m));});});});
-   _op["<*>"] = apply;
-   var mapIO = F2(function (f,xs) {    return A3($List.foldr,function (_p7) {    return seq(f(_p7));},pure({ctor: "_Tuple0"}),xs);});
-   var forEach = F2(function (xs,f) {    return A2(mapIO,f,xs);});
-   var map2 = F3(function (f,a,b) {    return A2(andThen,a,function (x) {    return A2(andThen,b,function (y) {    return pure(A2(f,x,y));});});});
-   var sequenceMany = function (ios) {
-      var _p8 = ios;
-      if (_p8.ctor === "[]") {
-            return pure(_U.list([]));
-         } else {
-            return A3(map2,F2(function (x,y) {    return A2($List._op["::"],x,y);}),_p8._0,sequenceMany(_p8._1));
-         }
-   };
-   var map = F2(function (f,io) {    var _p9 = io;if (_p9.ctor === "Pure") {    return Pure(f(_p9._0));} else {    return Impure(A2(mapF,map(f),_p9._0));}});
-   var writeFile = function (obj) {    return Impure(A2(WriteF,obj,function (_p10) {    return Pure({ctor: "_Tuple0"});}));};
-   var putStr = function (s) {    return Impure(A2(PutS,s,function (_p11) {    return Pure({ctor: "_Tuple0"});}));};
-   var exit = function (_p12) {    return Impure(Exit(_p12));};
-   var getChar = Impure(GetC(Pure));
-   var readUntil = function (end) {
-      var go = function (s) {
-         return A2(_op[">>="],getChar,function (c) {    return _U.eq(c,end) ? pure(s) : go(A2($String.append,s,A2($String.cons,c,"")));});
-      };
-      return go("");
-   };
-   var getLine = readUntil(_U.chr("\n"));
-   var putChar = function (c) {    return Impure(A2(PutS,A2($String.cons,c,""),function (_p13) {    return Pure({ctor: "_Tuple0"});}));};
-   var putStrLn = function (s) {    return A2(_op[">>>"],putStr(s),putChar(_U.chr("\n")));};
-   return _elm.Console.Core.values = {_op: _op
-                                     ,putChar: putChar
-                                     ,getChar: getChar
-                                     ,exit: exit
-                                     ,putStr: putStr
-                                     ,putStrLn: putStrLn
-                                     ,readUntil: readUntil
-                                     ,writeFile: writeFile
-                                     ,getLine: getLine
-                                     ,map: map
-                                     ,map2: map2
-                                     ,mapIO: mapIO
-                                     ,forEach: forEach
-                                     ,pure: pure
-                                     ,apply: apply
-                                     ,andThen: andThen
-                                     ,seq: seq
-                                     ,sequenceMany: sequenceMany
-                                     ,forever: forever
-                                     ,PutS: PutS
-                                     ,GetC: GetC
-                                     ,Exit: Exit
-                                     ,WriteF: WriteF
-                                     ,Pure: Pure
-                                     ,Impure: Impure
-                                     ,mapF: mapF};
-};
 Elm.Dict = Elm.Dict || {};
 Elm.Dict.make = function (_elm) {
    "use strict";
@@ -6567,2483 +6470,401 @@ Elm.Dict.make = function (_elm) {
                              ,toList: toList
                              ,fromList: fromList};
 };
-Elm.Native.Json = {};
+Elm.Native.Time = {};
 
-Elm.Native.Json.make = function(localRuntime) {
+Elm.Native.Time.make = function(localRuntime)
+{
 	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Json = localRuntime.Native.Json || {};
-	if (localRuntime.Native.Json.values) {
-		return localRuntime.Native.Json.values;
+	localRuntime.Native.Time = localRuntime.Native.Time || {};
+	if (localRuntime.Native.Time.values)
+	{
+		return localRuntime.Native.Time.values;
 	}
 
-	var ElmArray = Elm.Native.Array.make(localRuntime);
-	var List = Elm.Native.List.make(localRuntime);
+	var NS = Elm.Native.Signal.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
-	var Result = Elm.Result.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-	function crash(expected, actual) {
-		throw new Error(
-			'expecting ' + expected + ' but got ' + JSON.stringify(actual)
+	// FRAMES PER SECOND
+
+	function fpsWhen(desiredFPS, isOn)
+	{
+		var msPerFrame = 1000 / desiredFPS;
+		var ticker = NS.input('fps-' + desiredFPS, null);
+
+		function notifyTicker()
+		{
+			localRuntime.notify(ticker.id, null);
+		}
+
+		function firstArg(x, y)
+		{
+			return x;
+		}
+
+		// input fires either when isOn changes, or when ticker fires.
+		// Its value is a tuple with the current timestamp, and the state of isOn
+		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
+
+		var initialState = {
+			isOn: false,
+			time: localRuntime.timer.programStart,
+			delta: 0
+		};
+
+		var timeoutId;
+
+		function update(input, state)
+		{
+			var currentTime = input._0;
+			var isOn = input._1;
+			var wasOn = state.isOn;
+			var previousTime = state.time;
+
+			if (isOn)
+			{
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
+			}
+			else if (wasOn)
+			{
+				clearTimeout(timeoutId);
+			}
+
+			return {
+				isOn: isOn,
+				time: currentTime,
+				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
+			};
+		}
+
+		return A2(
+			NS.map,
+			function(state) { return state.delta; },
+			A3(NS.foldp, F2(update), update(input.value, initialState), input)
 		);
 	}
 
 
-	// PRIMITIVE VALUES
+	// EVERY
 
-	function decodeNull(successValue) {
-		return function(value) {
-			if (value === null) {
-				return successValue;
-			}
-			crash('null', value);
-		};
-	}
-
-
-	function decodeString(value) {
-		if (typeof value === 'string' || value instanceof String) {
-			return value;
+	function every(t)
+	{
+		var ticker = NS.input('every-' + t, null);
+		function tellTime()
+		{
+			localRuntime.notify(ticker.id, null);
 		}
-		crash('a String', value);
+		var clock = A2(NS.map, fst, NS.timestamp(ticker));
+		setInterval(tellTime, t);
+		return clock;
 	}
 
 
-	function decodeFloat(value) {
-		if (typeof value === 'number') {
-			return value;
-		}
-		crash('a Float', value);
+	function fst(pair)
+	{
+		return pair._0;
 	}
 
 
-	function decodeInt(value) {
-		if (typeof value !== 'number') {
-			crash('an Int', value);
-		}
-
-		if (value < 2147483647 && value > -2147483647 && (value | 0) === value) {
-			return value;
-		}
-
-		if (isFinite(value) && !(value % 1)) {
-			return value;
-		}
-
-		crash('an Int', value);
+	function read(s)
+	{
+		var t = Date.parse(s);
+		return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
 	}
 
-
-	function decodeBool(value) {
-		if (typeof value === 'boolean') {
-			return value;
-		}
-		crash('a Bool', value);
-	}
-
-
-	// ARRAY
-
-	function decodeArray(decoder) {
-		return function(value) {
-			if (value instanceof Array) {
-				var len = value.length;
-				var array = new Array(len);
-				for (var i = len; i--; ) {
-					array[i] = decoder(value[i]);
-				}
-				return ElmArray.fromJSArray(array);
-			}
-			crash('an Array', value);
-		};
-	}
-
-
-	// LIST
-
-	function decodeList(decoder) {
-		return function(value) {
-			if (value instanceof Array) {
-				var len = value.length;
-				var list = List.Nil;
-				for (var i = len; i--; ) {
-					list = List.Cons( decoder(value[i]), list );
-				}
-				return list;
-			}
-			crash('a List', value);
-		};
-	}
-
-
-	// MAYBE
-
-	function decodeMaybe(decoder) {
-		return function(value) {
-			try {
-				return Maybe.Just(decoder(value));
-			} catch(e) {
-				return Maybe.Nothing;
-			}
-		};
-	}
-
-
-	// FIELDS
-
-	function decodeField(field, decoder) {
-		return function(value) {
-			var subValue = value[field];
-			if (subValue !== undefined) {
-				return decoder(subValue);
-			}
-			crash("an object with field '" + field + "'", value);
-		};
-	}
-
-
-	// OBJECTS
-
-	function decodeKeyValuePairs(decoder) {
-		return function(value) {
-			var isObject =
-				typeof value === 'object'
-					&& value !== null
-					&& !(value instanceof Array);
-
-			if (isObject) {
-				var keyValuePairs = List.Nil;
-				for (var key in value)
-				{
-					var elmValue = decoder(value[key]);
-					var pair = Utils.Tuple2(key, elmValue);
-					keyValuePairs = List.Cons(pair, keyValuePairs);
-				}
-				return keyValuePairs;
-			}
-
-			crash('an object', value);
-		};
-	}
-
-	function decodeObject1(f, d1) {
-		return function(value) {
-			return f(d1(value));
-		};
-	}
-
-	function decodeObject2(f, d1, d2) {
-		return function(value) {
-			return A2( f, d1(value), d2(value) );
-		};
-	}
-
-	function decodeObject3(f, d1, d2, d3) {
-		return function(value) {
-			return A3( f, d1(value), d2(value), d3(value) );
-		};
-	}
-
-	function decodeObject4(f, d1, d2, d3, d4) {
-		return function(value) {
-			return A4( f, d1(value), d2(value), d3(value), d4(value) );
-		};
-	}
-
-	function decodeObject5(f, d1, d2, d3, d4, d5) {
-		return function(value) {
-			return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
-		};
-	}
-
-	function decodeObject6(f, d1, d2, d3, d4, d5, d6) {
-		return function(value) {
-			return A6( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value)
-			);
-		};
-	}
-
-	function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7) {
-		return function(value) {
-			return A7( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value),
-				d7(value)
-			);
-		};
-	}
-
-	function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
-		return function(value) {
-			return A8( f,
-				d1(value),
-				d2(value),
-				d3(value),
-				d4(value),
-				d5(value),
-				d6(value),
-				d7(value),
-				d8(value)
-			);
-		};
-	}
-
-
-	// TUPLES
-
-	function decodeTuple1(f, d1) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 1 ) {
-				crash('a Tuple of length 1', value);
-			}
-			return f( d1(value[0]) );
-		};
-	}
-
-	function decodeTuple2(f, d1, d2) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 2 ) {
-				crash('a Tuple of length 2', value);
-			}
-			return A2( f, d1(value[0]), d2(value[1]) );
-		};
-	}
-
-	function decodeTuple3(f, d1, d2, d3) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 3 ) {
-				crash('a Tuple of length 3', value);
-			}
-			return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
-		};
-	}
-
-
-	function decodeTuple4(f, d1, d2, d3, d4) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 4 ) {
-				crash('a Tuple of length 4', value);
-			}
-			return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
-		};
-	}
-
-
-	function decodeTuple5(f, d1, d2, d3, d4, d5) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 5 ) {
-				crash('a Tuple of length 5', value);
-			}
-			return A5( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4])
-			);
-		};
-	}
-
-
-	function decodeTuple6(f, d1, d2, d3, d4, d5, d6) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 6 ) {
-				crash('a Tuple of length 6', value);
-			}
-			return A6( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5])
-			);
-		};
-	}
-
-	function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 7 ) {
-				crash('a Tuple of length 7', value);
-			}
-			return A7( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5]),
-				d7(value[6])
-			);
-		};
-	}
-
-
-	function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
-		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 8 ) {
-				crash('a Tuple of length 8', value);
-			}
-			return A8( f,
-				d1(value[0]),
-				d2(value[1]),
-				d3(value[2]),
-				d4(value[3]),
-				d5(value[4]),
-				d6(value[5]),
-				d7(value[6]),
-				d8(value[7])
-			);
-		};
-	}
-
-
-	// CUSTOM DECODERS
-
-	function decodeValue(value) {
-		return value;
-	}
-
-	function runDecoderValue(decoder, value) {
-		try {
-			return Result.Ok(decoder(value));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-	function customDecoder(decoder, callback) {
-		return function(value) {
-			var result = callback(decoder(value));
-			if (result.ctor === 'Err') {
-				throw new Error('custom decoder failed: ' + result._0);
-			}
-			return result._0;
-		};
-	}
-
-	function andThen(decode, callback) {
-		return function(value) {
-			var result = decode(value);
-			return callback(result)(value);
-		};
-	}
-
-	function fail(msg) {
-		return function(value) {
-			throw new Error(msg);
-		};
-	}
-
-	function succeed(successValue) {
-		return function(value) {
-			return successValue;
-		};
-	}
-
-
-	// ONE OF MANY
-
-	function oneOf(decoders) {
-		return function(value) {
-			var errors = [];
-			var temp = decoders;
-			while (temp.ctor !== '[]') {
-				try {
-					return temp._0(value);
-				} catch(e) {
-					errors.push(e.message);
-				}
-				temp = temp._1;
-			}
-			throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
-		};
-	}
-
-	function get(decoder, value) {
-		try {
-			return Result.Ok(decoder(value));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-
-	// ENCODE / DECODE
-
-	function runDecoderString(decoder, string) {
-		try {
-			return Result.Ok(decoder(JSON.parse(string)));
-		} catch(e) {
-			return Result.Err(e.message);
-		}
-	}
-
-	function encode(indentLevel, value) {
-		return JSON.stringify(value, null, indentLevel);
-	}
-
-	function identity(value) {
-		return value;
-	}
-
-	function encodeObject(keyValuePairs) {
-		var obj = {};
-		while (keyValuePairs.ctor !== '[]') {
-			var pair = keyValuePairs._0;
-			obj[pair._0] = pair._1;
-			keyValuePairs = keyValuePairs._1;
-		}
-		return obj;
-	}
-
-	return localRuntime.Native.Json.values = {
-		encode: F2(encode),
-		runDecoderString: F2(runDecoderString),
-		runDecoderValue: F2(runDecoderValue),
-
-		get: F2(get),
-		oneOf: oneOf,
-
-		decodeNull: decodeNull,
-		decodeInt: decodeInt,
-		decodeFloat: decodeFloat,
-		decodeString: decodeString,
-		decodeBool: decodeBool,
-
-		decodeMaybe: decodeMaybe,
-
-		decodeList: decodeList,
-		decodeArray: decodeArray,
-
-		decodeField: F2(decodeField),
-
-		decodeObject1: F2(decodeObject1),
-		decodeObject2: F3(decodeObject2),
-		decodeObject3: F4(decodeObject3),
-		decodeObject4: F5(decodeObject4),
-		decodeObject5: F6(decodeObject5),
-		decodeObject6: F7(decodeObject6),
-		decodeObject7: F8(decodeObject7),
-		decodeObject8: F9(decodeObject8),
-		decodeKeyValuePairs: decodeKeyValuePairs,
-
-		decodeTuple1: F2(decodeTuple1),
-		decodeTuple2: F3(decodeTuple2),
-		decodeTuple3: F4(decodeTuple3),
-		decodeTuple4: F5(decodeTuple4),
-		decodeTuple5: F6(decodeTuple5),
-		decodeTuple6: F7(decodeTuple6),
-		decodeTuple7: F8(decodeTuple7),
-		decodeTuple8: F9(decodeTuple8),
-
-		andThen: F2(andThen),
-		decodeValue: decodeValue,
-		customDecoder: F2(customDecoder),
-		fail: fail,
-		succeed: succeed,
-
-		identity: identity,
-		encodeNull: null,
-		encodeArray: ElmArray.toJSArray,
-		encodeList: List.toArray,
-		encodeObject: encodeObject
-
+	return localRuntime.Native.Time.values = {
+		fpsWhen: F2(fpsWhen),
+		every: every,
+		toDate: function(t) { return new Date(t); },
+		read: read
 	};
 };
 
-Elm.Native.Array = {};
-Elm.Native.Array.make = function(localRuntime) {
+Elm.Time = Elm.Time || {};
+Elm.Time.make = function (_elm) {
+   "use strict";
+   _elm.Time = _elm.Time || {};
+   if (_elm.Time.values) return _elm.Time.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Native$Signal = Elm.Native.Signal.make(_elm),
+   $Native$Time = Elm.Native.Time.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var delay = $Native$Signal.delay;
+   var since = F2(function (time,signal) {
+      var stop = A2($Signal.map,$Basics.always(-1),A2(delay,time,signal));
+      var start = A2($Signal.map,$Basics.always(1),signal);
+      var delaydiff = A3($Signal.foldp,F2(function (x,y) {    return x + y;}),0,A2($Signal.merge,start,stop));
+      return A2($Signal.map,F2(function (x,y) {    return !_U.eq(x,y);})(0),delaydiff);
+   });
+   var timestamp = $Native$Signal.timestamp;
+   var every = $Native$Time.every;
+   var fpsWhen = $Native$Time.fpsWhen;
+   var fps = function (targetFrames) {    return A2(fpsWhen,targetFrames,$Signal.constant(true));};
+   var inMilliseconds = function (t) {    return t;};
+   var millisecond = 1;
+   var second = 1000 * millisecond;
+   var minute = 60 * second;
+   var hour = 60 * minute;
+   var inHours = function (t) {    return t / hour;};
+   var inMinutes = function (t) {    return t / minute;};
+   var inSeconds = function (t) {    return t / second;};
+   return _elm.Time.values = {_op: _op
+                             ,millisecond: millisecond
+                             ,second: second
+                             ,minute: minute
+                             ,hour: hour
+                             ,inMilliseconds: inMilliseconds
+                             ,inSeconds: inSeconds
+                             ,inMinutes: inMinutes
+                             ,inHours: inHours
+                             ,fps: fps
+                             ,fpsWhen: fpsWhen
+                             ,every: every
+                             ,timestamp: timestamp
+                             ,delay: delay
+                             ,since: since};
+};
+Elm.Set = Elm.Set || {};
+Elm.Set.make = function (_elm) {
+   "use strict";
+   _elm.Set = _elm.Set || {};
+   if (_elm.Set.values) return _elm.Set.values;
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Dict = Elm.Dict.make(_elm),$List = Elm.List.make(_elm);
+   var _op = {};
+   var foldr = F3(function (f,b,_p0) {    var _p1 = _p0;return A3($Dict.foldr,F3(function (k,_p2,b) {    return A2(f,k,b);}),b,_p1._0);});
+   var foldl = F3(function (f,b,_p3) {    var _p4 = _p3;return A3($Dict.foldl,F3(function (k,_p5,b) {    return A2(f,k,b);}),b,_p4._0);});
+   var toList = function (_p6) {    var _p7 = _p6;return $Dict.keys(_p7._0);};
+   var size = function (_p8) {    var _p9 = _p8;return $Dict.size(_p9._0);};
+   var member = F2(function (k,_p10) {    var _p11 = _p10;return A2($Dict.member,k,_p11._0);});
+   var isEmpty = function (_p12) {    var _p13 = _p12;return $Dict.isEmpty(_p13._0);};
+   var Set_elm_builtin = function (a) {    return {ctor: "Set_elm_builtin",_0: a};};
+   var empty = Set_elm_builtin($Dict.empty);
+   var singleton = function (k) {    return Set_elm_builtin(A2($Dict.singleton,k,{ctor: "_Tuple0"}));};
+   var insert = F2(function (k,_p14) {    var _p15 = _p14;return Set_elm_builtin(A3($Dict.insert,k,{ctor: "_Tuple0"},_p15._0));});
+   var fromList = function (xs) {    return A3($List.foldl,insert,empty,xs);};
+   var map = F2(function (f,s) {    return fromList(A2($List.map,f,toList(s)));});
+   var remove = F2(function (k,_p16) {    var _p17 = _p16;return Set_elm_builtin(A2($Dict.remove,k,_p17._0));});
+   var union = F2(function (_p19,_p18) {    var _p20 = _p19;var _p21 = _p18;return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));});
+   var intersect = F2(function (_p23,_p22) {    var _p24 = _p23;var _p25 = _p22;return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));});
+   var diff = F2(function (_p27,_p26) {    var _p28 = _p27;var _p29 = _p26;return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));});
+   var filter = F2(function (p,_p30) {    var _p31 = _p30;return Set_elm_builtin(A2($Dict.filter,F2(function (k,_p32) {    return p(k);}),_p31._0));});
+   var partition = F2(function (p,_p33) {
+      var _p34 = _p33;
+      var _p35 = A2($Dict.partition,F2(function (k,_p36) {    return p(k);}),_p34._0);
+      var p1 = _p35._0;
+      var p2 = _p35._1;
+      return {ctor: "_Tuple2",_0: Set_elm_builtin(p1),_1: Set_elm_builtin(p2)};
+   });
+   return _elm.Set.values = {_op: _op
+                            ,empty: empty
+                            ,singleton: singleton
+                            ,insert: insert
+                            ,remove: remove
+                            ,isEmpty: isEmpty
+                            ,member: member
+                            ,size: size
+                            ,foldl: foldl
+                            ,foldr: foldr
+                            ,map: map
+                            ,filter: filter
+                            ,partition: partition
+                            ,union: union
+                            ,intersect: intersect
+                            ,diff: diff
+                            ,toList: toList
+                            ,fromList: fromList};
+};
+Elm.Native.Keyboard = {};
 
+Elm.Native.Keyboard.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Array = localRuntime.Native.Array || {};
-	if (localRuntime.Native.Array.values)
+	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
+	if (localRuntime.Native.Keyboard.values)
 	{
-		return localRuntime.Native.Array.values;
-	}
-	if ('values' in Elm.Native.Array)
-	{
-		return localRuntime.Native.Array.values = Elm.Native.Array.values;
+		return localRuntime.Native.Keyboard.values;
 	}
 
-	var List = Elm.Native.List.make(localRuntime);
+	var NS = Elm.Native.Signal.make(localRuntime);
 
-	// A RRB-Tree has two distinct data types.
-	// Leaf -> "height"  is always 0
-	//         "table"   is an array of elements
-	// Node -> "height"  is always greater than 0
-	//         "table"   is an array of child nodes
-	//         "lengths" is an array of accumulated lengths of the child nodes
 
-	// M is the maximal table size. 32 seems fast. E is the allowed increase
-	// of search steps when concatting to find an index. Lower values will
-	// decrease balancing, but will increase search steps.
-	var M = 32;
-	var E = 2;
+	function keyEvent(event)
+	{
+		return {
+			alt: event.altKey,
+			meta: event.metaKey,
+			keyCode: event.keyCode
+		};
+	}
 
-	// An empty array.
-	var empty = {
-		ctor: '_Array',
-		height: 0,
-		table: []
+
+	function keyStream(node, eventName, handler)
+	{
+		var stream = NS.input(eventName, { alt: false, meta: false, keyCode: 0 });
+
+		localRuntime.addListener([stream.id], node, eventName, function(e) {
+			localRuntime.notify(stream.id, handler(e));
+		});
+
+		return stream;
+	}
+
+	var downs = keyStream(document, 'keydown', keyEvent);
+	var ups = keyStream(document, 'keyup', keyEvent);
+	var presses = keyStream(document, 'keypress', keyEvent);
+	var blurs = keyStream(window, 'blur', function() { return null; });
+
+
+	return localRuntime.Native.Keyboard.values = {
+		downs: downs,
+		ups: ups,
+		blurs: blurs,
+		presses: presses
 	};
-
-
-	function get(i, array)
-	{
-		if (i < 0 || i >= length(array))
-		{
-			throw new Error(
-				'Index ' + i + ' is out of range. Check the length of ' +
-				'your array first or use getMaybe or getWithDefault.');
-		}
-		return unsafeGet(i, array);
-	}
-
-
-	function unsafeGet(i, array)
-	{
-		for (var x = array.height; x > 0; x--)
-		{
-			var slot = i >> (x * 5);
-			while (array.lengths[slot] <= i)
-			{
-				slot++;
-			}
-			if (slot > 0)
-			{
-				i -= array.lengths[slot - 1];
-			}
-			array = array.table[slot];
-		}
-		return array.table[i];
-	}
-
-
-	// Sets the value at the index i. Only the nodes leading to i will get
-	// copied and updated.
-	function set(i, item, array)
-	{
-		if (i < 0 || length(array) <= i)
-		{
-			return array;
-		}
-		return unsafeSet(i, item, array);
-	}
-
-
-	function unsafeSet(i, item, array)
-	{
-		array = nodeCopy(array);
-
-		if (array.height === 0)
-		{
-			array.table[i] = item;
-		}
-		else
-		{
-			var slot = getSlot(i, array);
-			if (slot > 0)
-			{
-				i -= array.lengths[slot - 1];
-			}
-			array.table[slot] = unsafeSet(i, item, array.table[slot]);
-		}
-		return array;
-	}
-
-
-	function initialize(len, f)
-	{
-		if (len <= 0)
-		{
-			return empty;
-		}
-		var h = Math.floor( Math.log(len) / Math.log(M) );
-		return initialize_(f, h, 0, len);
-	}
-
-	function initialize_(f, h, from, to)
-	{
-		if (h === 0)
-		{
-			var table = new Array((to - from) % (M + 1));
-			for (var i = 0; i < table.length; i++)
-			{
-			  table[i] = f(from + i);
-			}
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: table
-			};
-		}
-
-		var step = Math.pow(M, h);
-		var table = new Array(Math.ceil((to - from) / step));
-		var lengths = new Array(table.length);
-		for (var i = 0; i < table.length; i++)
-		{
-			table[i] = initialize_(f, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
-			lengths[i] = length(table[i]) + (i > 0 ? lengths[i-1] : 0);
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: table,
-			lengths: lengths
-		};
-	}
-
-	function fromList(list)
-	{
-		if (list === List.Nil)
-		{
-			return empty;
-		}
-
-		// Allocate M sized blocks (table) and write list elements to it.
-		var table = new Array(M);
-		var nodes = [];
-		var i = 0;
-
-		while (list.ctor !== '[]')
-		{
-			table[i] = list._0;
-			list = list._1;
-			i++;
-
-			// table is full, so we can push a leaf containing it into the
-			// next node.
-			if (i === M)
-			{
-				var leaf = {
-					ctor: '_Array',
-					height: 0,
-					table: table
-				};
-				fromListPush(leaf, nodes);
-				table = new Array(M);
-				i = 0;
-			}
-		}
-
-		// Maybe there is something left on the table.
-		if (i > 0)
-		{
-			var leaf = {
-				ctor: '_Array',
-				height: 0,
-				table: table.splice(0, i)
-			};
-			fromListPush(leaf, nodes);
-		}
-
-		// Go through all of the nodes and eventually push them into higher nodes.
-		for (var h = 0; h < nodes.length - 1; h++)
-		{
-			if (nodes[h].table.length > 0)
-			{
-				fromListPush(nodes[h], nodes);
-			}
-		}
-
-		var head = nodes[nodes.length - 1];
-		if (head.height > 0 && head.table.length === 1)
-		{
-			return head.table[0];
-		}
-		else
-		{
-			return head;
-		}
-	}
-
-	// Push a node into a higher node as a child.
-	function fromListPush(toPush, nodes)
-	{
-		var h = toPush.height;
-
-		// Maybe the node on this height does not exist.
-		if (nodes.length === h)
-		{
-			var node = {
-				ctor: '_Array',
-				height: h + 1,
-				table: [],
-				lengths: []
-			};
-			nodes.push(node);
-		}
-
-		nodes[h].table.push(toPush);
-		var len = length(toPush);
-		if (nodes[h].lengths.length > 0)
-		{
-			len += nodes[h].lengths[nodes[h].lengths.length - 1];
-		}
-		nodes[h].lengths.push(len);
-
-		if (nodes[h].table.length === M)
-		{
-			fromListPush(nodes[h], nodes);
-			nodes[h] = {
-				ctor: '_Array',
-				height: h + 1,
-				table: [],
-				lengths: []
-			};
-		}
-	}
-
-	// Pushes an item via push_ to the bottom right of a tree.
-	function push(item, a)
-	{
-		var pushed = push_(item, a);
-		if (pushed !== null)
-		{
-			return pushed;
-		}
-
-		var newTree = create(item, a.height);
-		return siblise(a, newTree);
-	}
-
-	// Recursively tries to push an item to the bottom-right most
-	// tree possible. If there is no space left for the item,
-	// null will be returned.
-	function push_(item, a)
-	{
-		// Handle resursion stop at leaf level.
-		if (a.height === 0)
-		{
-			if (a.table.length < M)
-			{
-				var newA = {
-					ctor: '_Array',
-					height: 0,
-					table: a.table.slice()
-				};
-				newA.table.push(item);
-				return newA;
-			}
-			else
-			{
-			  return null;
-			}
-		}
-
-		// Recursively push
-		var pushed = push_(item, botRight(a));
-
-		// There was space in the bottom right tree, so the slot will
-		// be updated.
-		if (pushed !== null)
-		{
-			var newA = nodeCopy(a);
-			newA.table[newA.table.length - 1] = pushed;
-			newA.lengths[newA.lengths.length - 1]++;
-			return newA;
-		}
-
-		// When there was no space left, check if there is space left
-		// for a new slot with a tree which contains only the item
-		// at the bottom.
-		if (a.table.length < M)
-		{
-			var newSlot = create(item, a.height - 1);
-			var newA = nodeCopy(a);
-			newA.table.push(newSlot);
-			newA.lengths.push(newA.lengths[newA.lengths.length - 1] + length(newSlot));
-			return newA;
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	// Converts an array into a list of elements.
-	function toList(a)
-	{
-		return toList_(List.Nil, a);
-	}
-
-	function toList_(list, a)
-	{
-		for (var i = a.table.length - 1; i >= 0; i--)
-		{
-			list =
-				a.height === 0
-					? List.Cons(a.table[i], list)
-					: toList_(list, a.table[i]);
-		}
-		return list;
-	}
-
-	// Maps a function over the elements of an array.
-	function map(f, a)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: new Array(a.table.length)
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths;
-		}
-		for (var i = 0; i < a.table.length; i++)
-		{
-			newA.table[i] =
-				a.height === 0
-					? f(a.table[i])
-					: map(f, a.table[i]);
-		}
-		return newA;
-	}
-
-	// Maps a function over the elements with their index as first argument.
-	function indexedMap(f, a)
-	{
-		return indexedMap_(f, a, 0);
-	}
-
-	function indexedMap_(f, a, from)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: new Array(a.table.length)
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths;
-		}
-		for (var i = 0; i < a.table.length; i++)
-		{
-			newA.table[i] =
-				a.height === 0
-					? A2(f, from + i, a.table[i])
-					: indexedMap_(f, a.table[i], i == 0 ? from : from + a.lengths[i - 1]);
-		}
-		return newA;
-	}
-
-	function foldl(f, b, a)
-	{
-		if (a.height === 0)
-		{
-			for (var i = 0; i < a.table.length; i++)
-			{
-				b = A2(f, a.table[i], b);
-			}
-		}
-		else
-		{
-			for (var i = 0; i < a.table.length; i++)
-			{
-				b = foldl(f, b, a.table[i]);
-			}
-		}
-		return b;
-	}
-
-	function foldr(f, b, a)
-	{
-		if (a.height === 0)
-		{
-			for (var i = a.table.length; i--; )
-			{
-				b = A2(f, a.table[i], b);
-			}
-		}
-		else
-		{
-			for (var i = a.table.length; i--; )
-			{
-				b = foldr(f, b, a.table[i]);
-			}
-		}
-		return b;
-	}
-
-	// TODO: currently, it slices the right, then the left. This can be
-	// optimized.
-	function slice(from, to, a)
-	{
-		if (from < 0)
-		{
-			from += length(a);
-		}
-		if (to < 0)
-		{
-			to += length(a);
-		}
-		return sliceLeft(from, sliceRight(to, a));
-	}
-
-	function sliceRight(to, a)
-	{
-		if (to === length(a))
-		{
-			return a;
-		}
-
-		// Handle leaf level.
-		if (a.height === 0)
-		{
-			var newA = { ctor:'_Array', height:0 };
-			newA.table = a.table.slice(0, to);
-			return newA;
-		}
-
-		// Slice the right recursively.
-		var right = getSlot(to, a);
-		var sliced = sliceRight(to - (right > 0 ? a.lengths[right - 1] : 0), a.table[right]);
-
-		// Maybe the a node is not even needed, as sliced contains the whole slice.
-		if (right === 0)
-		{
-			return sliced;
-		}
-
-		// Create new node.
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice(0, right),
-			lengths: a.lengths.slice(0, right)
-		};
-		if (sliced.table.length > 0)
-		{
-			newA.table[right] = sliced;
-			newA.lengths[right] = length(sliced) + (right > 0 ? newA.lengths[right - 1] : 0);
-		}
-		return newA;
-	}
-
-	function sliceLeft(from, a)
-	{
-		if (from === 0)
-		{
-			return a;
-		}
-
-		// Handle leaf level.
-		if (a.height === 0)
-		{
-			var newA = { ctor:'_Array', height:0 };
-			newA.table = a.table.slice(from, a.table.length + 1);
-			return newA;
-		}
-
-		// Slice the left recursively.
-		var left = getSlot(from, a);
-		var sliced = sliceLeft(from - (left > 0 ? a.lengths[left - 1] : 0), a.table[left]);
-
-		// Maybe the a node is not even needed, as sliced contains the whole slice.
-		if (left === a.table.length - 1)
-		{
-			return sliced;
-		}
-
-		// Create new node.
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice(left, a.table.length + 1),
-			lengths: new Array(a.table.length - left)
-		};
-		newA.table[0] = sliced;
-		var len = 0;
-		for (var i = 0; i < newA.table.length; i++)
-		{
-			len += length(newA.table[i]);
-			newA.lengths[i] = len;
-		}
-
-		return newA;
-	}
-
-	// Appends two trees.
-	function append(a,b)
-	{
-		if (a.table.length === 0)
-		{
-			return b;
-		}
-		if (b.table.length === 0)
-		{
-			return a;
-		}
-
-		var c = append_(a, b);
-
-		// Check if both nodes can be crunshed together.
-		if (c[0].table.length + c[1].table.length <= M)
-		{
-			if (c[0].table.length === 0)
-			{
-				return c[1];
-			}
-			if (c[1].table.length === 0)
-			{
-				return c[0];
-			}
-
-			// Adjust .table and .lengths
-			c[0].table = c[0].table.concat(c[1].table);
-			if (c[0].height > 0)
-			{
-				var len = length(c[0]);
-				for (var i = 0; i < c[1].lengths.length; i++)
-				{
-					c[1].lengths[i] += len;
-				}
-				c[0].lengths = c[0].lengths.concat(c[1].lengths);
-			}
-
-			return c[0];
-		}
-
-		if (c[0].height > 0)
-		{
-			var toRemove = calcToRemove(a, b);
-			if (toRemove > E)
-			{
-				c = shuffle(c[0], c[1], toRemove);
-			}
-		}
-
-		return siblise(c[0], c[1]);
-	}
-
-	// Returns an array of two nodes; right and left. One node _may_ be empty.
-	function append_(a, b)
-	{
-		if (a.height === 0 && b.height === 0)
-		{
-			return [a, b];
-		}
-
-		if (a.height !== 1 || b.height !== 1)
-		{
-			if (a.height === b.height)
-			{
-				a = nodeCopy(a);
-				b = nodeCopy(b);
-				var appended = append_(botRight(a), botLeft(b));
-
-				insertRight(a, appended[1]);
-				insertLeft(b, appended[0]);
-			}
-			else if (a.height > b.height)
-			{
-				a = nodeCopy(a);
-				var appended = append_(botRight(a), b);
-
-				insertRight(a, appended[0]);
-				b = parentise(appended[1], appended[1].height + 1);
-			}
-			else
-			{
-				b = nodeCopy(b);
-				var appended = append_(a, botLeft(b));
-
-				var left = appended[0].table.length === 0 ? 0 : 1;
-				var right = left === 0 ? 1 : 0;
-				insertLeft(b, appended[left]);
-				a = parentise(appended[right], appended[right].height + 1);
-			}
-		}
-
-		// Check if balancing is needed and return based on that.
-		if (a.table.length === 0 || b.table.length === 0)
-		{
-			return [a, b];
-		}
-
-		var toRemove = calcToRemove(a, b);
-		if (toRemove <= E)
-		{
-			return [a, b];
-		}
-		return shuffle(a, b, toRemove);
-	}
-
-	// Helperfunctions for append_. Replaces a child node at the side of the parent.
-	function insertRight(parent, node)
-	{
-		var index = parent.table.length - 1;
-		parent.table[index] = node;
-		parent.lengths[index] = length(node);
-		parent.lengths[index] += index > 0 ? parent.lengths[index - 1] : 0;
-	}
-
-	function insertLeft(parent, node)
-	{
-		if (node.table.length > 0)
-		{
-			parent.table[0] = node;
-			parent.lengths[0] = length(node);
-
-			var len = length(parent.table[0]);
-			for (var i = 1; i < parent.lengths.length; i++)
-			{
-				len += length(parent.table[i]);
-				parent.lengths[i] = len;
-			}
-		}
-		else
-		{
-			parent.table.shift();
-			for (var i = 1; i < parent.lengths.length; i++)
-			{
-				parent.lengths[i] = parent.lengths[i] - parent.lengths[0];
-			}
-			parent.lengths.shift();
-		}
-	}
-
-	// Returns the extra search steps for E. Refer to the paper.
-	function calcToRemove(a, b)
-	{
-		var subLengths = 0;
-		for (var i = 0; i < a.table.length; i++)
-		{
-			subLengths += a.table[i].table.length;
-		}
-		for (var i = 0; i < b.table.length; i++)
-		{
-			subLengths += b.table[i].table.length;
-		}
-
-		var toRemove = a.table.length + b.table.length;
-		return toRemove - (Math.floor((subLengths - 1) / M) + 1);
-	}
-
-	// get2, set2 and saveSlot are helpers for accessing elements over two arrays.
-	function get2(a, b, index)
-	{
-		return index < a.length
-			? a[index]
-			: b[index - a.length];
-	}
-
-	function set2(a, b, index, value)
-	{
-		if (index < a.length)
-		{
-			a[index] = value;
-		}
-		else
-		{
-			b[index - a.length] = value;
-		}
-	}
-
-	function saveSlot(a, b, index, slot)
-	{
-		set2(a.table, b.table, index, slot);
-
-		var l = (index === 0 || index === a.lengths.length)
-			? 0
-			: get2(a.lengths, a.lengths, index - 1);
-
-		set2(a.lengths, b.lengths, index, l + length(slot));
-	}
-
-	// Creates a node or leaf with a given length at their arrays for perfomance.
-	// Is only used by shuffle.
-	function createNode(h, length)
-	{
-		if (length < 0)
-		{
-			length = 0;
-		}
-		var a = {
-			ctor: '_Array',
-			height: h,
-			table: new Array(length)
-		};
-		if (h > 0)
-		{
-			a.lengths = new Array(length);
-		}
-		return a;
-	}
-
-	// Returns an array of two balanced nodes.
-	function shuffle(a, b, toRemove)
-	{
-		var newA = createNode(a.height, Math.min(M, a.table.length + b.table.length - toRemove));
-		var newB = createNode(a.height, newA.table.length - (a.table.length + b.table.length - toRemove));
-
-		// Skip the slots with size M. More precise: copy the slot references
-		// to the new node
-		var read = 0;
-		while (get2(a.table, b.table, read).table.length % M === 0)
-		{
-			set2(newA.table, newB.table, read, get2(a.table, b.table, read));
-			set2(newA.lengths, newB.lengths, read, get2(a.lengths, b.lengths, read));
-			read++;
-		}
-
-		// Pulling items from left to right, caching in a slot before writing
-		// it into the new nodes.
-		var write = read;
-		var slot = new createNode(a.height - 1, 0);
-		var from = 0;
-
-		// If the current slot is still containing data, then there will be at
-		// least one more write, so we do not break this loop yet.
-		while (read - write - (slot.table.length > 0 ? 1 : 0) < toRemove)
-		{
-			// Find out the max possible items for copying.
-			var source = get2(a.table, b.table, read);
-			var to = Math.min(M - slot.table.length, source.table.length);
-
-			// Copy and adjust size table.
-			slot.table = slot.table.concat(source.table.slice(from, to));
-			if (slot.height > 0)
-			{
-				var len = slot.lengths.length;
-				for (var i = len; i < len + to - from; i++)
-				{
-					slot.lengths[i] = length(slot.table[i]);
-					slot.lengths[i] += (i > 0 ? slot.lengths[i - 1] : 0);
-				}
-			}
-
-			from += to;
-
-			// Only proceed to next slots[i] if the current one was
-			// fully copied.
-			if (source.table.length <= to)
-			{
-				read++; from = 0;
-			}
-
-			// Only create a new slot if the current one is filled up.
-			if (slot.table.length === M)
-			{
-				saveSlot(newA, newB, write, slot);
-				slot = createNode(a.height - 1, 0);
-				write++;
-			}
-		}
-
-		// Cleanup after the loop. Copy the last slot into the new nodes.
-		if (slot.table.length > 0)
-		{
-			saveSlot(newA, newB, write, slot);
-			write++;
-		}
-
-		// Shift the untouched slots to the left
-		while (read < a.table.length + b.table.length )
-		{
-			saveSlot(newA, newB, write, get2(a.table, b.table, read));
-			read++;
-			write++;
-		}
-
-		return [newA, newB];
-	}
-
-	// Navigation functions
-	function botRight(a)
-	{
-		return a.table[a.table.length - 1];
-	}
-	function botLeft(a)
-	{
-		return a.table[0];
-	}
-
-	// Copies a node for updating. Note that you should not use this if
-	// only updating only one of "table" or "lengths" for performance reasons.
-	function nodeCopy(a)
-	{
-		var newA = {
-			ctor: '_Array',
-			height: a.height,
-			table: a.table.slice()
-		};
-		if (a.height > 0)
-		{
-			newA.lengths = a.lengths.slice();
-		}
-		return newA;
-	}
-
-	// Returns how many items are in the tree.
-	function length(array)
-	{
-		if (array.height === 0)
-		{
-			return array.table.length;
-		}
-		else
-		{
-			return array.lengths[array.lengths.length - 1];
-		}
-	}
-
-	// Calculates in which slot of "table" the item probably is, then
-	// find the exact slot via forward searching in  "lengths". Returns the index.
-	function getSlot(i, a)
-	{
-		var slot = i >> (5 * a.height);
-		while (a.lengths[slot] <= i)
-		{
-			slot++;
-		}
-		return slot;
-	}
-
-	// Recursively creates a tree with a given height containing
-	// only the given item.
-	function create(item, h)
-	{
-		if (h === 0)
-		{
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: [item]
-			};
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: [create(item, h - 1)],
-			lengths: [1]
-		};
-	}
-
-	// Recursively creates a tree that contains the given tree.
-	function parentise(tree, h)
-	{
-		if (h === tree.height)
-		{
-			return tree;
-		}
-
-		return {
-			ctor: '_Array',
-			height: h,
-			table: [parentise(tree, h - 1)],
-			lengths: [length(tree)]
-		};
-	}
-
-	// Emphasizes blood brotherhood beneath two trees.
-	function siblise(a, b)
-	{
-		return {
-			ctor: '_Array',
-			height: a.height + 1,
-			table: [a, b],
-			lengths: [length(a), length(a) + length(b)]
-		};
-	}
-
-	function toJSArray(a)
-	{
-		var jsArray = new Array(length(a));
-		toJSArray_(jsArray, 0, a);
-		return jsArray;
-	}
-
-	function toJSArray_(jsArray, i, a)
-	{
-		for (var t = 0; t < a.table.length; t++)
-		{
-			if (a.height === 0)
-			{
-				jsArray[i + t] = a.table[t];
-			}
-			else
-			{
-				var inc = t === 0 ? 0 : a.lengths[t - 1];
-				toJSArray_(jsArray, i + inc, a.table[t]);
-			}
-		}
-	}
-
-	function fromJSArray(jsArray)
-	{
-		if (jsArray.length === 0)
-		{
-			return empty;
-		}
-		var h = Math.floor(Math.log(jsArray.length) / Math.log(M));
-		return fromJSArray_(jsArray, h, 0, jsArray.length);
-	}
-
-	function fromJSArray_(jsArray, h, from, to)
-	{
-		if (h === 0)
-		{
-			return {
-				ctor: '_Array',
-				height: 0,
-				table: jsArray.slice(from, to)
-			};
-		}
-
-		var step = Math.pow(M, h);
-		var table = new Array(Math.ceil((to - from) / step));
-		var lengths = new Array(table.length);
-		for (var i = 0; i < table.length; i++)
-		{
-			table[i] = fromJSArray_(jsArray, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
-			lengths[i] = length(table[i]) + (i > 0 ? lengths[i - 1] : 0);
-		}
-		return {
-			ctor: '_Array',
-			height: h,
-			table: table,
-			lengths: lengths
-		};
-	}
-
-	Elm.Native.Array.values = {
-		empty: empty,
-		fromList: fromList,
-		toList: toList,
-		initialize: F2(initialize),
-		append: F2(append),
-		push: F2(push),
-		slice: F3(slice),
-		get: F2(get),
-		set: F3(set),
-		map: F2(map),
-		indexedMap: F2(indexedMap),
-		foldl: F3(foldl),
-		foldr: F3(foldr),
-		length: length,
-
-		toJSArray: toJSArray,
-		fromJSArray: fromJSArray
-	};
-
-	return localRuntime.Native.Array.values = Elm.Native.Array.values;
 };
 
-Elm.Array = Elm.Array || {};
-Elm.Array.make = function (_elm) {
+Elm.Keyboard = Elm.Keyboard || {};
+Elm.Keyboard.make = function (_elm) {
    "use strict";
-   _elm.Array = _elm.Array || {};
-   if (_elm.Array.values) return _elm.Array.values;
+   _elm.Keyboard = _elm.Keyboard || {};
+   if (_elm.Keyboard.values) return _elm.Keyboard.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$Array = Elm.Native.Array.make(_elm);
-   var _op = {};
-   var append = $Native$Array.append;
-   var length = $Native$Array.length;
-   var isEmpty = function (array) {    return _U.eq(length(array),0);};
-   var slice = $Native$Array.slice;
-   var set = $Native$Array.set;
-   var get = F2(function (i,array) {
-      return _U.cmp(0,i) < 1 && _U.cmp(i,$Native$Array.length(array)) < 0 ? $Maybe.Just(A2($Native$Array.get,i,array)) : $Maybe.Nothing;
-   });
-   var push = $Native$Array.push;
-   var empty = $Native$Array.empty;
-   var filter = F2(function (isOkay,arr) {
-      var update = F2(function (x,xs) {    return isOkay(x) ? A2($Native$Array.push,x,xs) : xs;});
-      return A3($Native$Array.foldl,update,$Native$Array.empty,arr);
-   });
-   var foldr = $Native$Array.foldr;
-   var foldl = $Native$Array.foldl;
-   var indexedMap = $Native$Array.indexedMap;
-   var map = $Native$Array.map;
-   var toIndexedList = function (array) {
-      return A3($List.map2,
-      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
-      _U.range(0,$Native$Array.length(array) - 1),
-      $Native$Array.toList(array));
-   };
-   var toList = $Native$Array.toList;
-   var fromList = $Native$Array.fromList;
-   var initialize = $Native$Array.initialize;
-   var repeat = F2(function (n,e) {    return A2(initialize,n,$Basics.always(e));});
-   var Array = {ctor: "Array"};
-   return _elm.Array.values = {_op: _op
-                              ,empty: empty
-                              ,repeat: repeat
-                              ,initialize: initialize
-                              ,fromList: fromList
-                              ,isEmpty: isEmpty
-                              ,length: length
-                              ,push: push
-                              ,append: append
-                              ,get: get
-                              ,set: set
-                              ,slice: slice
-                              ,toList: toList
-                              ,toIndexedList: toIndexedList
-                              ,map: map
-                              ,indexedMap: indexedMap
-                              ,filter: filter
-                              ,foldl: foldl
-                              ,foldr: foldr};
-};
-Elm.Json = Elm.Json || {};
-Elm.Json.Encode = Elm.Json.Encode || {};
-Elm.Json.Encode.make = function (_elm) {
-   "use strict";
-   _elm.Json = _elm.Json || {};
-   _elm.Json.Encode = _elm.Json.Encode || {};
-   if (_elm.Json.Encode.values) return _elm.Json.Encode.values;
-   var _U = Elm.Native.Utils.make(_elm),$Array = Elm.Array.make(_elm),$Native$Json = Elm.Native.Json.make(_elm);
-   var _op = {};
-   var list = $Native$Json.encodeList;
-   var array = $Native$Json.encodeArray;
-   var object = $Native$Json.encodeObject;
-   var $null = $Native$Json.encodeNull;
-   var bool = $Native$Json.identity;
-   var $float = $Native$Json.identity;
-   var $int = $Native$Json.identity;
-   var string = $Native$Json.identity;
-   var encode = $Native$Json.encode;
-   var Value = {ctor: "Value"};
-   return _elm.Json.Encode.values = {_op: _op
-                                    ,encode: encode
-                                    ,string: string
-                                    ,$int: $int
-                                    ,$float: $float
-                                    ,bool: bool
-                                    ,$null: $null
-                                    ,list: list
-                                    ,array: array
-                                    ,object: object};
-};
-Elm.Json = Elm.Json || {};
-Elm.Json.Decode = Elm.Json.Decode || {};
-Elm.Json.Decode.make = function (_elm) {
-   "use strict";
-   _elm.Json = _elm.Json || {};
-   _elm.Json.Decode = _elm.Json.Decode || {};
-   if (_elm.Json.Decode.values) return _elm.Json.Decode.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Array = Elm.Array.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$Json = Elm.Native.Json.make(_elm),
-   $Result = Elm.Result.make(_elm);
-   var _op = {};
-   var tuple8 = $Native$Json.decodeTuple8;
-   var tuple7 = $Native$Json.decodeTuple7;
-   var tuple6 = $Native$Json.decodeTuple6;
-   var tuple5 = $Native$Json.decodeTuple5;
-   var tuple4 = $Native$Json.decodeTuple4;
-   var tuple3 = $Native$Json.decodeTuple3;
-   var tuple2 = $Native$Json.decodeTuple2;
-   var tuple1 = $Native$Json.decodeTuple1;
-   var succeed = $Native$Json.succeed;
-   var fail = $Native$Json.fail;
-   var andThen = $Native$Json.andThen;
-   var customDecoder = $Native$Json.customDecoder;
-   var decodeValue = $Native$Json.runDecoderValue;
-   var value = $Native$Json.decodeValue;
-   var maybe = $Native$Json.decodeMaybe;
-   var $null = $Native$Json.decodeNull;
-   var array = $Native$Json.decodeArray;
-   var list = $Native$Json.decodeList;
-   var bool = $Native$Json.decodeBool;
-   var $int = $Native$Json.decodeInt;
-   var $float = $Native$Json.decodeFloat;
-   var string = $Native$Json.decodeString;
-   var oneOf = $Native$Json.oneOf;
-   var keyValuePairs = $Native$Json.decodeKeyValuePairs;
-   var object8 = $Native$Json.decodeObject8;
-   var object7 = $Native$Json.decodeObject7;
-   var object6 = $Native$Json.decodeObject6;
-   var object5 = $Native$Json.decodeObject5;
-   var object4 = $Native$Json.decodeObject4;
-   var object3 = $Native$Json.decodeObject3;
-   var object2 = $Native$Json.decodeObject2;
-   var object1 = $Native$Json.decodeObject1;
-   _op[":="] = $Native$Json.decodeField;
-   var at = F2(function (fields,decoder) {    return A3($List.foldr,F2(function (x,y) {    return A2(_op[":="],x,y);}),decoder,fields);});
-   var decodeString = $Native$Json.runDecoderString;
-   var map = $Native$Json.decodeObject1;
-   var dict = function (decoder) {    return A2(map,$Dict.fromList,keyValuePairs(decoder));};
-   var Decoder = {ctor: "Decoder"};
-   return _elm.Json.Decode.values = {_op: _op
-                                    ,decodeString: decodeString
-                                    ,decodeValue: decodeValue
-                                    ,string: string
-                                    ,$int: $int
-                                    ,$float: $float
-                                    ,bool: bool
-                                    ,$null: $null
-                                    ,list: list
-                                    ,array: array
-                                    ,tuple1: tuple1
-                                    ,tuple2: tuple2
-                                    ,tuple3: tuple3
-                                    ,tuple4: tuple4
-                                    ,tuple5: tuple5
-                                    ,tuple6: tuple6
-                                    ,tuple7: tuple7
-                                    ,tuple8: tuple8
-                                    ,at: at
-                                    ,object1: object1
-                                    ,object2: object2
-                                    ,object3: object3
-                                    ,object4: object4
-                                    ,object5: object5
-                                    ,object6: object6
-                                    ,object7: object7
-                                    ,object8: object8
-                                    ,keyValuePairs: keyValuePairs
-                                    ,dict: dict
-                                    ,maybe: maybe
-                                    ,oneOf: oneOf
-                                    ,map: map
-                                    ,fail: fail
-                                    ,succeed: succeed
-                                    ,andThen: andThen
-                                    ,value: value
-                                    ,customDecoder: customDecoder};
-};
-Elm.Trampoline = Elm.Trampoline || {};
-Elm.Trampoline.make = function (_elm) {
-   "use strict";
-   _elm.Trampoline = _elm.Trampoline || {};
-   if (_elm.Trampoline.values) return _elm.Trampoline.values;
-   var _U = Elm.Native.Utils.make(_elm);
-   var _op = {};
-   var trampoline = function (tramp) {
-      trampoline: while (true) {
-         var _p0 = tramp;
-         if (_p0.ctor === "Done") {
-               return _p0._0;
-            } else {
-               var _v1 = _p0._0({ctor: "_Tuple0"});
-               tramp = _v1;
-               continue trampoline;
-            }
-      }
-   };
-   var Continue = function (a) {    return {ctor: "Continue",_0: a};};
-   var Done = function (a) {    return {ctor: "Done",_0: a};};
-   return _elm.Trampoline.values = {_op: _op,trampoline: trampoline,Done: Done,Continue: Continue};
-};
-Elm.Native.Console = {};
-Elm.Native.Console.NativeCom = {};
-Elm.Native.Console.NativeCom.make = function(localRuntime) {
-
-    localRuntime.Native = localRuntime.Native || {};
-    localRuntime.Native.Console = localRuntime.Console.Native || {};
-    localRuntime.Native.Console.NativeCom = localRuntime.Native.Console.NativeCom || {};
-    if (localRuntime.Native.Console.NativeCom.values) {
-    return localRuntime.Native.Console.NativeCom.values;
-    }
-
-    /* Elm imports */
-    var List = Elm.Native.List.make(localRuntime);
-    var Maybe = Elm.Maybe.make(localRuntime);
-    var NS = Elm.Native.Signal.make(localRuntime);
-    var Task = Elm.Native.Task.make(localRuntime);
-    var Utils = Elm.Native.Utils.make(localRuntime);
-
-
-    var fs = null;
-
-    /* Node.js imports */
-    if (typeof module !== 'undefined' && module.exports && typeof require !== 'undefined') {
-        fs = require('fs');
-
-        process.stdin.on('data', function(chunk) {
-            process.stdin.pause();
-            sendResponseString(chunk.toString());
-        })
-    }
-
-    var responsesSignal = NS.input('Console.NativeCom.responses', Maybe.Nothing);
-
-    var sendResponseString = function(str) {
-        var value = Maybe.Nothing;
-        if (str !== null && str.length > 0) {
-            value = Maybe.Just(str);
-        }
-        setTimeout(function() {
-            localRuntime.notify(responsesSignal.id, value);
-        }, 0);
-    }
-
-    var sendRequestBatch = function(list) {
-        var requests = List.toArray(list);
-        if (requests.length == 0) {
-            return Task.succeed(Utils.Tuple0);
-        }
-
-        return Task.asyncFunction(function(callback) {
-
-            requests.forEach(doRequest);
-
-            var lastReq = requests[requests.length - 1];
-            if (lastReq.ctor !== 'Get') {
-                // if we are not waiting for stdin,
-                // trigger the next IO requests immediately
-                sendResponseString(null);
-            }
-
-            return callback(Task.succeed(Utils.Tuple0));
-        });
-    }
-
-    var doRequest = function(request) {
-        switch(request.ctor) {
-            case 'Put':
-                process.stdout.write(request._0);
-                break;
-            case 'Get':
-                process.stdin.resume();
-                break;
-            case 'Exit':
-                process.exit(request._0);
-                break;
-            case 'WriteFile':
-                fs.writeFileSync(request._0.file, request._0.content);
-                break;
-            case 'Init':
-                // trigger the initial IO requests
-                sendResponseString(null);
-                break;
-        }
-    }
-
-    return localRuntime.Native.Console.NativeCom.values = {
-        sendRequestBatch: sendRequestBatch,
-        responses: responsesSignal
-    };
-};
-
-Elm.Console = Elm.Console || {};
-Elm.Console.NativeCom = Elm.Console.NativeCom || {};
-Elm.Console.NativeCom.make = function (_elm) {
-   "use strict";
-   _elm.Console = _elm.Console || {};
-   _elm.Console.NativeCom = _elm.Console.NativeCom || {};
-   if (_elm.Console.NativeCom.values) return _elm.Console.NativeCom.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$Console$NativeCom = Elm.Native.Console.NativeCom.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var responses = $Native$Console$NativeCom.responses;
-   var sendRequestBatch = function (requests) {    return $Native$Console$NativeCom.sendRequestBatch(requests);};
-   var sendRequests = function (requests) {    return A2($Signal.map,sendRequestBatch,requests);};
-   var Init = {ctor: "Init"};
-   var WriteFile = function (a) {    return {ctor: "WriteFile",_0: a};};
-   var Get = {ctor: "Get"};
-   var Exit = function (a) {    return {ctor: "Exit",_0: a};};
-   var Put = function (a) {    return {ctor: "Put",_0: a};};
-   return _elm.Console.NativeCom.values = {_op: _op
-                                          ,Put: Put
-                                          ,Exit: Exit
-                                          ,Get: Get
-                                          ,WriteFile: WriteFile
-                                          ,Init: Init
-                                          ,sendRequests: sendRequests
-                                          ,sendRequestBatch: sendRequestBatch
-                                          ,responses: responses};
-};
-Elm.Console = Elm.Console || {};
-Elm.Console.Runner = Elm.Console.Runner || {};
-Elm.Console.Runner.make = function (_elm) {
-   "use strict";
-   _elm.Console = _elm.Console || {};
-   _elm.Console.Runner = _elm.Console.Runner || {};
-   if (_elm.Console.Runner.values) return _elm.Console.Runner.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Console$Core = Elm.Console.Core.make(_elm),
-   $Console$NativeCom = Elm.Console.NativeCom.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $Task = Elm.Task.make(_elm),
-   $Trampoline = Elm.Trampoline.make(_elm);
-   var _op = {};
-   var mapFst = F2(function (f,_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: f(_p1._0),_1: _p1._1};});
-   var put = F2(function (s,_p2) {    return {ctor: "_Tuple2",_0: s,_1: {ctor: "_Tuple0"}};});
-   var get = function (s) {    return {ctor: "_Tuple2",_0: s,_1: s};};
-   _op[">>="] = F3(function (f,k,s) {    var _p3 = f(s);var s$ = _p3._0;var y = _p3._1;return A2(k,y,s$);});
-   var pure = F2(function (x,s) {    return {ctor: "_Tuple2",_0: s,_1: x};});
-   var mapSt = F2(function (f,sf) {    return A2(_op[">>="],sf,function (_p4) {    return pure(f(_p4));});});
-   var writeF = $Console$NativeCom.WriteFile;
-   var getS = $Console$NativeCom.Get;
-   var exit = $Console$NativeCom.Exit;
-   var putS = $Console$NativeCom.Put;
-   var extractRequests = function (io) {
-      var _p5 = io;
-      if (_p5.ctor === "Pure") {
-            return pure({ctor: "_Tuple2",_0: _U.list([exit(0)]),_1: function (_p6) {    return $Console$Core.Pure(_p5._0);}});
-         } else {
-            var _p7 = _p5._0;
-            switch (_p7.ctor)
-            {case "PutS": return A2(mapSt,
-                 mapFst(function (rs) {    return A2($List._op["::"],putS(_p7._0),rs);}),
-                 pure({ctor: "_Tuple2",_0: _U.list([]),_1: _p7._1}));
-               case "WriteF": return A2(mapSt,
-                 mapFst(function (rs) {    return A2($List._op["::"],writeF(_p7._0),rs);}),
-                 pure({ctor: "_Tuple2",_0: _U.list([]),_1: _p7._1}));
-               case "Exit": return pure({ctor: "_Tuple2",_0: _U.list([exit(_p7._0)]),_1: function (_p8) {    return io;}});
-               default: return A2(_op[">>="],
-                 get,
-                 function (st) {
-                    var _p9 = $String.uncons(st.buffer);
-                    if (_p9.ctor === "Nothing") {
-                          return pure({ctor: "_Tuple2",_0: _U.list([getS]),_1: function (_p10) {    return io;}});
-                       } else {
-                          return A2(_op[">>="],put({buffer: _p9._0._1}),function (_p11) {    return extractRequests(_p7._0(_p9._0._0));});
-                       }
-                 });}
-         }
-   };
-   var step = F3(function (resp,io,st) {
-      var newST = function () {
-         var _p12 = resp;
-         if (_p12.ctor === "Nothing") {
-               return st;
-            } else {
-               return {buffer: A2($String.append,st.buffer,_p12._0)};
-            }
-      }();
-      var _p13 = A2(extractRequests,io({ctor: "_Tuple0"}),newST);
-      var newST$ = _p13._0;
-      var rs = _p13._1._0;
-      var k = _p13._1._1;
-      return {ctor: "_Tuple3",_0: k,_1: newST$,_2: rs};
-   });
-   var flattenReqs = function (rs) {
-      var loop = F3(function (rs,acc,n) {
-         loop: while (true) if (_U.cmp(n,100) > -1) return $Trampoline.Continue(function (_p14) {    return A3(loop,rs,acc,0);}); else {
-               var _p15 = rs;
-               if (_p15.ctor === "[]") {
-                     return $Trampoline.Done($List.reverse(acc));
-                  } else {
-                     if (_p15._1.ctor === "[]") {
-                           var _v6 = _U.list([]),_v7 = A2($List._op["::"],_p15._0,acc),_v8 = n + 1;
-                           rs = _v6;
-                           acc = _v7;
-                           n = _v8;
-                           continue loop;
-                        } else {
-                           var _p19 = _p15._1._1;
-                           var _p18 = _p15._1._0;
-                           var _p17 = _p15._0;
-                           var _p16 = {ctor: "_Tuple2",_0: _p17,_1: _p18};
-                           _v9_2: do {
-                              if (_p16.ctor === "_Tuple2") {
-                                    switch (_p16._0.ctor)
-                                    {case "Exit": var _v10 = _U.list([]),_v11 = A2($List._op["::"],_p17,acc),_v12 = _p16._0._0 + 1;
-                                         rs = _v10;
-                                         acc = _v11;
-                                         n = _v12;
-                                         continue loop;
-                                       case "Put": if (_p16._1.ctor === "Put") {
-                                               var _v13 = A2($List._op["::"],putS(A2($Basics._op["++"],_p16._0._0,_p16._1._0)),_p19),_v14 = acc,_v15 = n + 1;
-                                               rs = _v13;
-                                               acc = _v14;
-                                               n = _v15;
-                                               continue loop;
-                                            } else {
-                                               break _v9_2;
-                                            }
-                                       default: break _v9_2;}
-                                 } else {
-                                    break _v9_2;
-                                 }
-                           } while (false);
-                           var _v16 = A2($List._op["::"],_p18,_p19),_v17 = A2($List._op["::"],_p17,acc),_v18 = n + 1;
-                           rs = _v16;
-                           acc = _v17;
-                           n = _v18;
-                           continue loop;
-                        }
-                  }
-            }
-      });
-      return $Trampoline.trampoline(A3(loop,rs,_U.list([]),0));
-   };
-   var start = {buffer: ""};
-   var run = function (io) {
-      var third = function (_p20) {    var _p21 = _p20;return _p21._2;};
-      var f = F2(function (resp,_p22) {    var _p23 = _p22;return A3(step,resp,_p23._0,_p23._1);});
-      var init = {ctor: "_Tuple3",_0: function (_p24) {    return io;},_1: start,_2: _U.list([$Console$NativeCom.Init])};
-      return $Console$NativeCom.sendRequests(A2($Signal.map,third,A3($Signal.foldp,f,init,$Console$NativeCom.responses)));
-   };
-   var IOState = function (a) {    return {buffer: a};};
-   return _elm.Console.Runner.values = {_op: _op
-                                       ,IOState: IOState
-                                       ,start: start
-                                       ,run: run
-                                       ,putS: putS
-                                       ,exit: exit
-                                       ,getS: getS
-                                       ,writeF: writeF
-                                       ,extractRequests: extractRequests
-                                       ,flattenReqs: flattenReqs
-                                       ,step: step
-                                       ,pure: pure
-                                       ,mapSt: mapSt
-                                       ,get: get
-                                       ,put: put
-                                       ,mapFst: mapFst};
-};
-Elm.Console = Elm.Console || {};
-Elm.Console.make = function (_elm) {
-   "use strict";
-   _elm.Console = _elm.Console || {};
-   if (_elm.Console.values) return _elm.Console.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Console$Core = Elm.Console.Core.make(_elm),
-   $Console$Runner = Elm.Console.Runner.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var run = $Console$Runner.run;
-   var forever = $Console$Core.forever;
-   _op[">>>"] = $Console$Core.seq;
-   var sequenceMany = $Console$Core.sequenceMany;
-   var seq = $Console$Core.seq;
-   _op[">>="] = $Console$Core.andThen;
-   var andThen = $Console$Core.andThen;
-   _op["<*>"] = $Console$Core.apply;
-   var apply = $Console$Core.apply;
-   var pure = $Console$Core.pure;
-   var forEach = $Console$Core.forEach;
-   var mapIO = $Console$Core.mapIO;
-   var map2 = $Console$Core.map2;
-   var map = $Console$Core.map;
-   var getLine = $Console$Core.getLine;
-   var writeFile = $Console$Core.writeFile;
-   var readUntil = $Console$Core.readUntil;
-   var putStrLn = $Console$Core.putStrLn;
-   var putStr = $Console$Core.putStr;
-   var exit = $Console$Core.exit;
-   var getChar = $Console$Core.getChar;
-   var putChar = $Console$Core.putChar;
-   return _elm.Console.values = {_op: _op
-                                ,putChar: putChar
-                                ,putStr: putStr
-                                ,putStrLn: putStrLn
-                                ,getChar: getChar
-                                ,getLine: getLine
-                                ,readUntil: readUntil
-                                ,writeFile: writeFile
-                                ,exit: exit
-                                ,map: map
-                                ,map2: map2
-                                ,mapIO: mapIO
-                                ,forEach: forEach
-                                ,pure: pure
-                                ,apply: apply
-                                ,andThen: andThen
-                                ,seq: seq
-                                ,sequenceMany: sequenceMany
-                                ,forever: forever
-                                ,run: run};
-};
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Assertion = Elm.ElmTest.Assertion || {};
-Elm.ElmTest.Assertion.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Assertion = _elm.ElmTest.Assertion || {};
-   if (_elm.ElmTest.Assertion.values) return _elm.ElmTest.Assertion.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
+   $Char = Elm.Char.make(_elm),
+   $Native$Keyboard = Elm.Native.Keyboard.make(_elm),
+   $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var AlwaysFail = function (a) {    return {ctor: "AlwaysFail",_0: a};};
-   var AlwaysPass = {ctor: "AlwaysPass"};
-   var AssertNotEqual = F3(function (a,b,c) {    return {ctor: "AssertNotEqual",_0: a,_1: b,_2: c};});
-   var assertNotEqual = F2(function (a,b) {    return A3(AssertNotEqual,function (_p0) {    return !_U.eq(a,b);},$Basics.toString(a),$Basics.toString(b));});
-   var AssertEqual = F3(function (a,b,c) {    return {ctor: "AssertEqual",_0: a,_1: b,_2: c};});
-   var assertEqual = F2(function (a,b) {    return A3(AssertEqual,function (_p1) {    return _U.eq(a,b);},$Basics.toString(a),$Basics.toString(b));});
-   var assertionList = F2(function (xs,ys) {    return A3($List.map2,assertEqual,xs,ys);});
-   var AssertFalse = function (a) {    return {ctor: "AssertFalse",_0: a};};
-   var AssertTrue = function (a) {    return {ctor: "AssertTrue",_0: a};};
-   var assertT = AssertTrue;
-   var assert = function (b) {    return AssertTrue(function (_p2) {    return b;});};
-   return _elm.ElmTest.Assertion.values = {_op: _op
-                                          ,assertionList: assertionList
-                                          ,assertT: assertT
-                                          ,assert: assert
-                                          ,assertEqual: assertEqual
-                                          ,assertNotEqual: assertNotEqual
-                                          ,AssertTrue: AssertTrue
-                                          ,AssertFalse: AssertFalse
-                                          ,AssertEqual: AssertEqual
-                                          ,AssertNotEqual: AssertNotEqual
-                                          ,AlwaysPass: AlwaysPass
-                                          ,AlwaysFail: AlwaysFail};
-};
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Test = Elm.ElmTest.Test || {};
-Elm.ElmTest.Test.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Test = _elm.ElmTest.Test || {};
-   if (_elm.ElmTest.Test.values) return _elm.ElmTest.Test.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Assertion = Elm.ElmTest.Assertion.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var numberOfSuites = function (test) {
-      var _p0 = test;
-      if (_p0.ctor === "TestCase") {
-            return 0;
-         } else {
-            return 1 + function (_p1) {
-               return $List.sum(A2($List.map,numberOfSuites,_p1));
-            }(_p0._1);
-         }
-   };
-   var numberOfTests = function (test) {
-      var _p2 = test;
-      if (_p2.ctor === "TestCase") {
-            return 1;
-         } else {
-            return function (_p3) {
-               return $List.sum(A2($List.map,numberOfTests,_p3));
-            }(_p2._1);
-         }
-   };
-   var nameOf = function (test) {    var _p4 = test;if (_p4.ctor === "TestCase") {    return _p4._0;} else {    return _p4._0;}};
-   var Suite = F2(function (a,b) {    return {ctor: "Suite",_0: a,_1: b};});
-   var suite = Suite;
-   var TestCase = F2(function (a,b) {    return {ctor: "TestCase",_0: a,_1: b};});
-   var test = F2(function (name,a) {    return A2(TestCase,name,a);});
-   var defaultTest = function (a) {
-      var name = function () {
-         var _p5 = a;
-         switch (_p5.ctor)
-         {case "AssertTrue": return "True";
-            case "AssertFalse": return "False";
-            case "AssertEqual": return A2($Basics._op["++"],_p5._1,A2($Basics._op["++"]," == ",_p5._2));
-            case "AssertNotEqual": return A2($Basics._op["++"],_p5._1,A2($Basics._op["++"]," /= ",_p5._2));
-            case "AlwaysPass": return "Always passes";
-            default: return "Always fails";}
-      }();
-      return A2(test,name,a);
-   };
-   var equals = F2(function (a,b) {    return defaultTest(A2($ElmTest$Assertion.assertEqual,a,b));});
-   return _elm.ElmTest.Test.values = {_op: _op
-                                     ,test: test
-                                     ,equals: equals
-                                     ,defaultTest: defaultTest
-                                     ,suite: suite
-                                     ,numberOfTests: numberOfTests
-                                     ,numberOfSuites: numberOfSuites
-                                     ,TestCase: TestCase
-                                     ,Suite: Suite};
-};
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Run = Elm.ElmTest.Run || {};
-Elm.ElmTest.Run.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Run = _elm.ElmTest.Run || {};
-   if (_elm.ElmTest.Run.values) return _elm.ElmTest.Run.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Assertion = Elm.ElmTest.Assertion.make(_elm),
-   $ElmTest$Test = Elm.ElmTest.Test.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var failedSuites = function (result) {
-      var _p0 = result;
-      if (_p0.ctor === "Report") {
-            var _p2 = _p0._1;
-            var failed = _U.cmp($List.length(_p2.failures),0) > 0 ? 1 : 0;
-            return failed + function (_p1) {
-               return $List.sum(A2($List.map,failedSuites,_p1));
-            }(_p2.results);
-         } else {
-            return 0;
-         }
-   };
-   var passedSuites = function (result) {
-      var _p3 = result;
-      if (_p3.ctor === "Report") {
-            var _p5 = _p3._1;
-            var passed = _U.eq($List.length(_p5.failures),0) ? 1 : 0;
-            return passed + function (_p4) {
-               return $List.sum(A2($List.map,passedSuites,_p4));
-            }(_p5.results);
-         } else {
-            return 0;
-         }
-   };
-   var failedTests = function (result) {
-      var _p6 = result;
-      switch (_p6.ctor)
-      {case "Pass": return 0;
-         case "Fail": return 1;
-         default: return function (_p7) {
-              return $List.sum(A2($List.map,failedTests,_p7));
-           }(_p6._1.results);}
-   };
-   var passedTests = function (result) {
-      var _p8 = result;
-      switch (_p8.ctor)
-      {case "Pass": return 1;
-         case "Fail": return 0;
-         default: return function (_p9) {
-              return $List.sum(A2($List.map,passedTests,_p9));
-           }(_p8._1.results);}
-   };
-   var pass = function (m) {
-      var _p10 = m;
-      switch (_p10.ctor)
-      {case "Pass": return true;
-         case "Fail": return false;
-         default: return _U.cmp($List.length(function (_) {    return _.failures;}(_p10._1)),0) > 0 ? false : true;}
-   };
-   var fail = function (_p11) {    return $Basics.not(pass(_p11));};
-   var Report = F2(function (a,b) {    return {ctor: "Report",_0: a,_1: b};});
-   var Fail = F2(function (a,b) {    return {ctor: "Fail",_0: a,_1: b};});
-   var Pass = function (a) {    return {ctor: "Pass",_0: a};};
-   var run = function (test) {
-      var _p12 = test;
-      if (_p12.ctor === "TestCase") {
-            var _p14 = _p12._0;
-            var runAssertion = F2(function (t,m) {    return t({ctor: "_Tuple0"}) ? Pass(_p14) : A2(Fail,_p14,m);});
-            var _p13 = _p12._1;
-            switch (_p13.ctor)
-            {case "AssertEqual": return A2(runAssertion,
-                 _p13._0,
-                 A2($Basics._op["++"],"Expected: ",A2($Basics._op["++"],_p13._1,A2($Basics._op["++"],"; got: ",_p13._2))));
-               case "AssertNotEqual": return A2(runAssertion,_p13._0,A2($Basics._op["++"],_p13._1,A2($Basics._op["++"]," equals ",_p13._2)));
-               case "AssertTrue": return A2(runAssertion,_p13._0,"not True");
-               case "AssertFalse": return A2(runAssertion,_p13._0,"not False");
-               case "AlwaysPass": return A2(runAssertion,$Basics.always(true),"");
-               default: return A2(runAssertion,$Basics.always(false),_p13._0);}
-         } else {
-            var results = A2($List.map,run,_p12._1);
-            var _p15 = A2($List.partition,pass,results);
-            var passes = _p15._0;
-            var fails = _p15._1;
-            return A2(Report,_p12._0,{results: results,passes: passes,failures: fails});
-         }
-   };
-   var Summary = F3(function (a,b,c) {    return {results: a,passes: b,failures: c};});
-   return _elm.ElmTest.Run.values = {_op: _op
-                                    ,run: run
-                                    ,pass: pass
-                                    ,fail: fail
-                                    ,failedTests: failedTests
-                                    ,passedTests: passedTests
-                                    ,failedSuites: failedSuites
-                                    ,passedSuites: passedSuites
-                                    ,Pass: Pass
-                                    ,Fail: Fail
-                                    ,Report: Report};
-};
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Runner = Elm.ElmTest.Runner || {};
-Elm.ElmTest.Runner.String = Elm.ElmTest.Runner.String || {};
-Elm.ElmTest.Runner.String.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Runner = _elm.ElmTest.Runner || {};
-   _elm.ElmTest.Runner.String = _elm.ElmTest.Runner.String || {};
-   if (_elm.ElmTest.Runner.String.values) return _elm.ElmTest.Runner.String.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Run = Elm.ElmTest.Run.make(_elm),
-   $ElmTest$Test = Elm.ElmTest.Test.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var replicate = F2(function (n,c) {
-      var go = function (n) {    return _U.cmp(n,0) < 1 ? _U.list([]) : A2($List._op["::"],c,go(n - 1));};
-      return function (_p0) {
-         return $String.fromList(go(_p0));
-      }(n);
-   });
-   var vcat = function (_p1) {    return $String.concat(A2($List.intersperse,"\n",_p1));};
-   var indent = function (n) {
-      var indents = A2(replicate,n,_U.chr(" "));
-      return function (_p2) {
-         return vcat(A2($List.map,$String.append(indents),$String.lines(_p2)));
-      };
-   };
-   var pretty = F2(function (n,result) {
-      var passed = $ElmTest$Run.pass(result);
-      var _p3 = result;
-      switch (_p3.ctor)
-      {case "Pass": return _U.list([{ctor: "_Tuple2",_0: A2(indent,n,A2($Basics._op["++"],_p3._0,": passed.")),_1: result}]);
-         case "Fail": return _U.list([{ctor: "_Tuple2",_0: A2(indent,n,A2($Basics._op["++"],_p3._0,A2($Basics._op["++"],": FAILED. ",_p3._1))),_1: result}]);
-         default: var allPassed = _U.eq($ElmTest$Run.failedTests(result),0);
-           var subResults = allPassed ? _U.list([]) : A2($List.concatMap,pretty(n + 2),_p3._1.results);
-           var msg = A2($Basics._op["++"],"Test Suite: ",A2($Basics._op["++"],_p3._0,A2($Basics._op["++"],": ",passed ? "all tests passed" : "FAILED")));
-           return A2($List._op["::"],{ctor: "_Tuple2",_0: A2(indent,n,msg),_1: result},subResults);}
-   });
-   var run = function (t) {
-      var tests = function () {
-         var _p4 = t;
-         if (_p4.ctor === "TestCase") {
-               return _U.list([A2($ElmTest$Test.TestCase,_p4._0,_p4._1)]);
-            } else {
-               return _p4._1;
-            }
-      }();
-      var result = $ElmTest$Run.run(t);
-      var passedTests$ = $ElmTest$Run.passedTests(result);
-      var passedSuites$ = $ElmTest$Run.passedSuites(result);
-      var failedTests$ = $ElmTest$Run.failedTests(result);
-      var allPassed = _U.eq(failedTests$,0) ? $ElmTest$Run.Pass("") : A2($ElmTest$Run.Fail,"","");
-      var failedSuites$ = $ElmTest$Run.failedSuites(result);
-      var summary = function (_p5) {
-         return vcat(A2($List.map,indent(2),_p5));
-      }(_U.list([A2($Basics._op["++"],
-                $Basics.toString($ElmTest$Test.numberOfSuites(t)),
-                A2($Basics._op["++"]," suites run, containing ",A2($Basics._op["++"],$Basics.toString($ElmTest$Test.numberOfTests(t))," tests")))
-                ,_U.eq(failedTests$,0) ? "All tests passed" : A2($Basics._op["++"],
-                $Basics.toString(passedSuites$),
-                A2($Basics._op["++"]," suites and ",A2($Basics._op["++"],$Basics.toString(passedTests$)," tests passed")))
-                ,_U.eq(failedTests$,0) ? "" : A2($Basics._op["++"],
-                $Basics.toString(failedSuites$),
-                A2($Basics._op["++"]," suites and ",A2($Basics._op["++"],$Basics.toString(failedTests$)," tests failed")))]));
-      var results$ = function () {
-         var _p6 = allPassed;
-         if (_p6.ctor === "Pass") {
-               return _U.list([{ctor: "_Tuple2",_0: "",_1: allPassed}]);
-            } else {
-               return A2(pretty,0,result);
-            }
-      }();
-      return A2($List._op["::"],{ctor: "_Tuple2",_0: summary,_1: allPassed},results$);
-   };
-   var runDisplay = function (t) {
-      var _p7 = run(t);
-      if (_p7.ctor === "::" && _p7._0.ctor === "_Tuple2") {
-            return vcat(A2($List._op["::"],A2($Basics._op["++"],_p7._0._0,"\n"),A2($List.map,$Basics.fst,_p7._1)));
-         } else {
-            return "";
-         }
-   };
-   return _elm.ElmTest.Runner.String.values = {_op: _op,runDisplay: runDisplay,run: run};
-};
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Runner = Elm.ElmTest.Runner || {};
-Elm.ElmTest.Runner.Element = Elm.ElmTest.Runner.Element || {};
-Elm.ElmTest.Runner.Element.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Runner = _elm.ElmTest.Runner || {};
-   _elm.ElmTest.Runner.Element = _elm.ElmTest.Runner.Element || {};
-   if (_elm.ElmTest.Runner.Element.values) return _elm.ElmTest.Runner.Element.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Color = Elm.Color.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Run = Elm.ElmTest.Run.make(_elm),
-   $ElmTest$Runner$String = Elm.ElmTest.Runner.String.make(_elm),
-   $ElmTest$Test = Elm.ElmTest.Test.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $Text = Elm.Text.make(_elm);
-   var _op = {};
-   var maxOrZero = function (l) {    return A3($List.foldl,$Basics.max,0,l);};
-   var indent = function (s) {    var trimmed = $String.trimLeft(s);return $String.length(s) - $String.length(trimmed);};
-   var red = A3($Color.rgb,255,126,132);
-   var plainText = function (s) {    return $Graphics$Element.leftAligned($Text.fromString(s));};
-   var pretty = function (_p0) {
+   var presses = A2($Signal.map,function (_) {    return _.keyCode;},$Native$Keyboard.presses);
+   var toXY = F2(function (_p0,keyCodes) {
       var _p1 = _p0;
-      var _p5 = _p1._0;
-      var _p4 = _p1._1;
-      var w$ = 5;
-      var w = indent(_p5) * 10;
-      var _p2 = _p4;
+      var is = function (keyCode) {    return A2($Set.member,keyCode,keyCodes) ? 1 : 0;};
+      return {x: is(_p1.right) - is(_p1.left),y: is(_p1.up) - is(_p1.down)};
+   });
+   var Directions = F4(function (a,b,c,d) {    return {up: a,down: b,left: c,right: d};});
+   var dropMap = F2(function (f,signal) {    return $Signal.dropRepeats(A2($Signal.map,f,signal));});
+   var EventInfo = F3(function (a,b,c) {    return {alt: a,meta: b,keyCode: c};});
+   var Blur = {ctor: "Blur"};
+   var Down = function (a) {    return {ctor: "Down",_0: a};};
+   var Up = function (a) {    return {ctor: "Up",_0: a};};
+   var rawEvents = $Signal.mergeMany(_U.list([A2($Signal.map,Up,$Native$Keyboard.ups)
+                                             ,A2($Signal.map,Down,$Native$Keyboard.downs)
+                                             ,A2($Signal.map,$Basics.always(Blur),$Native$Keyboard.blurs)]));
+   var empty = {alt: false,meta: false,keyCodes: $Set.empty};
+   var update = F2(function (event,model) {
+      var _p2 = event;
       switch (_p2.ctor)
-      {case "Pass": return A2($Graphics$Element.flow,
-           $Graphics$Element.right,
-           _U.list([A2($Graphics$Element.spacer,w,1),plainText(_p5),A2($Graphics$Element.spacer,w$,1)]));
-         case "Fail": return A2($Graphics$Element.color,
-           red,
-           A2($Graphics$Element.flow,$Graphics$Element.right,_U.list([A2($Graphics$Element.spacer,w,1),plainText(_p5),A2($Graphics$Element.spacer,w$,1)])));
-         default: var f = _U.cmp($ElmTest$Run.failedTests(_p4),0) > 0 ? $Graphics$Element.color(red) : $Basics.identity;
-           return f(A2($Graphics$Element.flow,
-           $Graphics$Element.right,
-           _U.list([A2($Graphics$Element.spacer,w,1)
-                   ,function (_p3) {
-                      return $Graphics$Element.leftAligned($Text.bold($Text.fromString(_p3)));
-                   }(_p5)
-                   ,A2($Graphics$Element.spacer,w$,1)])));}
-   };
-   var runDisplay = function (tests) {
-      var _p6 = $ElmTest$Runner$String.run(tests);
-      if (_p6.ctor === "::" && _p6._0.ctor === "_Tuple2") {
-            var _p8 = _p6._1;
-            var results$ = A2($List.map,pretty,_p8);
-            var maxWidth = function (_p7) {    return maxOrZero(A2($List.map,$Graphics$Element.widthOf,_p7));}(results$);
-            var separator = A2($Graphics$Element.color,$Color.white,A2($Graphics$Element.spacer,maxWidth,1));
-            var elements = _U.eq(_p8,_U.list([{ctor: "_Tuple2",_0: "",_1: _p6._0._1}])) ? _U.list([]) : A2($List.intersperse,
-            separator,
-            A2($List.map,function (elem) {    return A2($Graphics$Element.width,maxWidth,elem);},results$));
-            return A2($Graphics$Element.flow,
-            $Graphics$Element.down,
-            A2($List._op["::"],plainText(_p6._0._0),A2($List._op["::"],A2($Graphics$Element.spacer,1,10),elements)));
-         } else {
-            return A2($Graphics$Element.flow,$Graphics$Element.down,_U.list([]));
-         }
-   };
-   return _elm.ElmTest.Runner.Element.values = {_op: _op,runDisplay: runDisplay};
+      {case "Down": var _p3 = _p2._0;
+           return {alt: _p3.alt,meta: _p3.meta,keyCodes: A2($Set.insert,_p3.keyCode,model.keyCodes)};
+         case "Up": var _p4 = _p2._0;
+           return {alt: _p4.alt,meta: _p4.meta,keyCodes: A2($Set.remove,_p4.keyCode,model.keyCodes)};
+         default: return empty;}
+   });
+   var model = A3($Signal.foldp,update,empty,rawEvents);
+   var alt = A2(dropMap,function (_) {    return _.alt;},model);
+   var meta = A2(dropMap,function (_) {    return _.meta;},model);
+   var keysDown = A2(dropMap,function (_) {    return _.keyCodes;},model);
+   var arrows = A2(dropMap,toXY({up: 38,down: 40,left: 37,right: 39}),keysDown);
+   var wasd = A2(dropMap,toXY({up: 87,down: 83,left: 65,right: 68}),keysDown);
+   var isDown = function (keyCode) {    return A2(dropMap,$Set.member(keyCode),keysDown);};
+   var ctrl = isDown(17);
+   var shift = isDown(16);
+   var space = isDown(32);
+   var enter = isDown(13);
+   var Model = F3(function (a,b,c) {    return {alt: a,meta: b,keyCodes: c};});
+   return _elm.Keyboard.values = {_op: _op
+                                 ,arrows: arrows
+                                 ,wasd: wasd
+                                 ,enter: enter
+                                 ,space: space
+                                 ,ctrl: ctrl
+                                 ,shift: shift
+                                 ,alt: alt
+                                 ,meta: meta
+                                 ,isDown: isDown
+                                 ,keysDown: keysDown
+                                 ,presses: presses};
 };
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.Runner = Elm.ElmTest.Runner || {};
-Elm.ElmTest.Runner.Console = Elm.ElmTest.Runner.Console || {};
-Elm.ElmTest.Runner.Console.make = function (_elm) {
-   "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   _elm.ElmTest.Runner = _elm.ElmTest.Runner || {};
-   _elm.ElmTest.Runner.Console = _elm.ElmTest.Runner.Console || {};
-   if (_elm.ElmTest.Runner.Console.values) return _elm.ElmTest.Runner.Console.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Console = Elm.Console.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Run = Elm.ElmTest.Run.make(_elm),
-   $ElmTest$Runner$String = Elm.ElmTest.Runner.String.make(_elm),
-   $ElmTest$Test = Elm.ElmTest.Test.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var runDisplay = function (tests) {
-      var _p0 = $ElmTest$Runner$String.run(tests);
-      if (_p0.ctor === "::" && _p0._0.ctor === "_Tuple2") {
-            var out = A2($Basics._op["++"],
-            _p0._0._0,
-            A2($Basics._op["++"],"\n\n",function (_p1) {    return $String.concat(A2($List.intersperse,"\n",A2($List.map,$Basics.fst,_p1)));}(_p0._1)));
-            return A2($Console._op[">>>"],
-            $Console.putStrLn(out),
-            function () {
-               var _p2 = $ElmTest$Run.pass(_p0._0._1);
-               if (_p2 === true) {
-                     return $Console.exit(0);
-                  } else {
-                     return $Console.exit(1);
-                  }
-            }());
-         } else {
-            return $Console.exit(1);
-         }
-   };
-   return _elm.ElmTest.Runner.Console.values = {_op: _op,runDisplay: runDisplay};
+Elm.Native = Elm.Native || {};
+Elm.Native.Window = {};
+Elm.Native.Window.make = function make(localRuntime) {
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Window = localRuntime.Native.Window || {};
+	if (localRuntime.Native.Window.values)
+	{
+		return localRuntime.Native.Window.values;
+	}
+
+	var NS = Elm.Native.Signal.make(localRuntime);
+	var Tuple2 = Elm.Native.Utils.make(localRuntime).Tuple2;
+
+
+	function getWidth()
+	{
+		return localRuntime.node.clientWidth;
+	}
+
+
+	function getHeight()
+	{
+		if (localRuntime.isFullscreen())
+		{
+			return window.innerHeight;
+		}
+		return localRuntime.node.clientHeight;
+	}
+
+
+	var dimensions = NS.input('Window.dimensions', Tuple2(getWidth(), getHeight()));
+
+
+	function resizeIfNeeded()
+	{
+		// Do not trigger event if the dimensions have not changed.
+		// This should be most of the time.
+		var w = getWidth();
+		var h = getHeight();
+		if (dimensions.value._0 === w && dimensions.value._1 === h)
+		{
+			return;
+		}
+
+		setTimeout(function() {
+			// Check again to see if the dimensions have changed.
+			// It is conceivable that the dimensions have changed
+			// again while some other event was being processed.
+			w = getWidth();
+			h = getHeight();
+			if (dimensions.value._0 === w && dimensions.value._1 === h)
+			{
+				return;
+			}
+			localRuntime.notify(dimensions.id, Tuple2(w, h));
+		}, 0);
+	}
+
+
+	localRuntime.addListener([dimensions.id], window, 'resize', resizeIfNeeded);
+
+
+	return localRuntime.Native.Window.values = {
+		dimensions: dimensions,
+		resizeIfNeeded: resizeIfNeeded
+	};
 };
-Elm.ElmTest = Elm.ElmTest || {};
-Elm.ElmTest.make = function (_elm) {
+
+Elm.Window = Elm.Window || {};
+Elm.Window.make = function (_elm) {
    "use strict";
-   _elm.ElmTest = _elm.ElmTest || {};
-   if (_elm.ElmTest.values) return _elm.ElmTest.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Console = Elm.Console.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $ElmTest$Assertion = Elm.ElmTest.Assertion.make(_elm),
-   $ElmTest$Runner$Console = Elm.ElmTest.Runner.Console.make(_elm),
-   $ElmTest$Runner$Element = Elm.ElmTest.Runner.Element.make(_elm),
-   $ElmTest$Runner$String = Elm.ElmTest.Runner.String.make(_elm),
-   $ElmTest$Test = Elm.ElmTest.Test.make(_elm),
-   $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   _elm.Window = _elm.Window || {};
+   if (_elm.Window.values) return _elm.Window.values;
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Native$Window = Elm.Native.Window.make(_elm),$Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var stringRunner = $ElmTest$Runner$String.runDisplay;
-   var consoleRunner = $ElmTest$Runner$Console.runDisplay;
-   var elementRunner = $ElmTest$Runner$Element.runDisplay;
-   var fail = $ElmTest$Assertion.AlwaysFail;
-   var pass = $ElmTest$Assertion.AlwaysPass;
-   var assertionList = $ElmTest$Assertion.assertionList;
-   var lazyAssert = $ElmTest$Assertion.assertT;
-   var assertNotEqual = $ElmTest$Assertion.assertNotEqual;
-   var assertEqual = $ElmTest$Assertion.assertEqual;
-   var assert = $ElmTest$Assertion.assert;
-   var suite = $ElmTest$Test.suite;
-   var equals = $ElmTest$Test.equals;
-   var defaultTest = $ElmTest$Test.defaultTest;
-   var test = $ElmTest$Test.test;
-   return _elm.ElmTest.values = {_op: _op
-                                ,test: test
-                                ,defaultTest: defaultTest
-                                ,equals: equals
-                                ,suite: suite
-                                ,assert: assert
-                                ,assertEqual: assertEqual
-                                ,assertNotEqual: assertNotEqual
-                                ,lazyAssert: lazyAssert
-                                ,assertionList: assertionList
-                                ,pass: pass
-                                ,fail: fail
-                                ,elementRunner: elementRunner
-                                ,consoleRunner: consoleRunner
-                                ,stringRunner: stringRunner};
+   var dimensions = $Native$Window.dimensions;
+   var width = A2($Signal.map,$Basics.fst,dimensions);
+   var height = A2($Signal.map,$Basics.snd,dimensions);
+   return _elm.Window.values = {_op: _op,dimensions: dimensions,width: width,height: height};
 };
 Elm.Object = Elm.Object || {};
 Elm.Object.make = function (_elm) {
@@ -9095,6 +6916,24 @@ Elm.Constants.make = function (_elm) {
                                   ,halfWidth: halfWidth
                                   ,breakoutCharcoal: breakoutCharcoal
                                   ,textIvory: textIvory};
+};
+Elm.Player = Elm.Player || {};
+Elm.Player.make = function (_elm) {
+   "use strict";
+   _elm.Player = _elm.Player || {};
+   if (_elm.Player.values) return _elm.Player.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var makePlayer = function (x) {    return {x: x,y: 10 - $Constants.halfHeight,vy: 0.0,vx: 0.0,score: 0};};
+   return _elm.Player.values = {_op: _op,makePlayer: makePlayer};
 };
 Elm.Bricks = Elm.Bricks || {};
 Elm.Bricks.make = function (_elm) {
@@ -9154,33 +6993,171 @@ Elm.Bricks.make = function (_elm) {
                                ,displayBrick: displayBrick
                                ,displayBricks: displayBricks};
 };
-Elm.BricksTest = Elm.BricksTest || {};
-Elm.BricksTest.make = function (_elm) {
+Elm.Ball = Elm.Ball || {};
+Elm.Ball.make = function (_elm) {
    "use strict";
-   _elm.BricksTest = _elm.BricksTest || {};
-   if (_elm.BricksTest.values) return _elm.BricksTest.values;
+   _elm.Ball = _elm.Ball || {};
+   if (_elm.Ball.values) return _elm.Ball.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
+   $Player = Elm.Player.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var near = F3(function (object1,distance,object2) {    return _U.cmp(object2,object1 - distance) > -1 && _U.cmp(object2,object1 + distance) < 1;});
+   var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
+   var stepV = F3(function (v,lowerCollision,upperCollision) {    return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;});
+   var withinBrick = F2(function (ball,brick) {    return A3(near,ball.x,30,brick.x) && A3(near,ball.y,16,brick.y);});
+   var isTrue = function (x) {    return _U.eq(x,true);};
+   var ballWithinBricks = F2(function (ball,bricks) {    return A2($List.any,isTrue,A2($List.map,withinBrick(ball),bricks));});
+   return _elm.Ball.values = {_op: _op,isTrue: isTrue,withinBrick: withinBrick,ballWithinBricks: ballWithinBricks,stepV: stepV,near: near,within: within};
+};
+Elm.Game = Elm.Game || {};
+Elm.Game.make = function (_elm) {
+   "use strict";
+   _elm.Game = _elm.Game || {};
+   if (_elm.Game.values) return _elm.Game.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Ball = Elm.Ball.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Keyboard = Elm.Keyboard.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
+   $Player = Elm.Player.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Time = Elm.Time.make(_elm);
+   var _op = {};
+   var outOfPlayArea = function (ball) {    return _U.cmp(ball.y,5 - $Constants.halfHeight) < 0 ? true : false;};
+   var stepObj = F2(function (t,_p0) {    var _p1 = _p0;return _U.update(_p1,{x: _p1.x + _p1.vx * t,y: _p1.y + _p1.vy * t});});
+   var stepBall = F4(function (time,_p2,player,bricks) {
+      var _p3 = _p2;
+      var _p5 = _p3.x;
+      var _p4 = _p3;
+      var bwb = A2($List.any,$Ball.isTrue,A2($List.map,$Ball.withinBrick(_p4),bricks));
+      var d = A2($Debug.watch,"BWB",bwb);
+      return A2(stepObj,
+      time,
+      _U.update(_p4,
+      {vy: A3($Ball.stepV,_p3.vy,A2($Ball.within,_p4,player),_U.cmp(_p3.y,$Constants.halfHeight - 7) > 0 || bwb)
+      ,vx: A3($Ball.stepV,_p3.vx,_U.cmp(_p5,7 - $Constants.halfWidth) < 0,_U.cmp(_p5,$Constants.halfWidth - 7) > 0)}));
+   });
+   var stepPlayer = F3(function (time,direction,player) {
+      var score$ = player.score + 1;
+      var player$ = A2(stepObj,time,_U.update(player,{vx: $Basics.toFloat(direction) * 300}));
+      var x$ = A3($Basics.clamp,22 - $Constants.halfWidth,$Constants.halfWidth - 22,player$.x);
+      return _U.update(player$,{x: x$,score: score$});
+   });
+   var move = function (brick) {    return brick.hit ? $Constants.gameHeight + 1000 : brick.x;};
+   var remove = F2(function (ball,brick) {
+      var b = A2($Debug.watch,"Ball",_U.list([ball.x,ball.y]));
+      return A2($Ball.withinBrick,ball,brick) ? true : brick.hit;
+   });
+   var stepBrick = F2(function (ball,brick) {    return _U.update(brick,{hit: A2(remove,ball,brick),x: move(brick)});});
+   var stepBricks = F2(function (bricks,ball) {
+      var a = A2($Debug.watch,"Hit",A2($List.map,remove(ball),bricks));
+      var b = A2($Debug.watch,"Ball Within Bricks",A2($List.map,$Ball.withinBrick(ball),bricks));
+      var brs = A2($Debug.watch,"Bricks Hit",A2($List.map,function (_) {    return _.hit;},bricks));
+      var xy = function (brick) {    return _U.list([brick.x,brick.y]);};
+      return A2($List.map,stepBrick(ball),bricks);
+   });
+   var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));
+   var Game = F4(function (a,b,c,d) {    return {ball: a,state: b,player: c,bricks: d};});
+   var Input = F3(function (a,b,c) {    return {space: a,paddle: b,delta: c};});
+   var input = A2($Signal.sampleOn,delta,A4($Signal.map3,Input,$Keyboard.space,A2($Signal.map,function (_) {    return _.x;},$Keyboard.arrows),delta));
+   var Pause = {ctor: "Pause"};
+   var defaultGame = {ball: {x: 0,y: 0,vy: -100,vx: 100},state: Pause,player: $Player.makePlayer($Constants.gameHeight),bricks: $Bricks.createBricks};
+   var Play = {ctor: "Play"};
+   var stepGame = F2(function (input,game) {
+      var _p6 = game;
+      var ball = _p6.ball;
+      var state = _p6.state;
+      var player = _p6.player;
+      var bricks = _p6.bricks;
+      var bricks$ = A2(stepBricks,bricks,ball);
+      var _p7 = input;
+      var space = _p7.space;
+      var paddle = _p7.paddle;
+      var delta = _p7.delta;
+      var player$ = A3(stepPlayer,delta,paddle,player);
+      var ball$ = _U.eq(state,Pause) ? ball : A4(stepBall,delta,ball,player,bricks);
+      var state$ = space ? Play : outOfPlayArea(ball) ? Pause : state;
+      return _U.update(game,{player: player$,ball: ball$,bricks: bricks$,state: state$});
+   });
+   var gameState = A3($Signal.foldp,stepGame,defaultGame,input);
+   return _elm.Game.values = {_op: _op
+                             ,Play: Play
+                             ,Pause: Pause
+                             ,Input: Input
+                             ,Game: Game
+                             ,delta: delta
+                             ,remove: remove
+                             ,move: move
+                             ,stepObj: stepObj
+                             ,stepBricks: stepBricks
+                             ,stepBrick: stepBrick
+                             ,defaultGame: defaultGame
+                             ,input: input
+                             ,stepBall: stepBall
+                             ,stepPlayer: stepPlayer
+                             ,outOfPlayArea: outOfPlayArea
+                             ,stepGame: stepGame
+                             ,gameState: gameState};
+};
+Elm.Breakout = Elm.Breakout || {};
+Elm.Breakout.make = function (_elm) {
+   "use strict";
+   _elm.Breakout = _elm.Breakout || {};
+   if (_elm.Breakout.values) return _elm.Breakout.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bricks = Elm.Bricks.make(_elm),
    $Color = Elm.Color.make(_elm),
    $Constants = Elm.Constants.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $ElmTest = Elm.ElmTest.make(_elm),
+   $Game = Elm.Game.make(_elm),
+   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Object = Elm.Object.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Text = Elm.Text.make(_elm),
+   $Window = Elm.Window.make(_elm);
    var _op = {};
-   var brick = {x: 21 - $Constants.halfWidth,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green,hit: false};
-   var bricks = _U.list([brick]);
-   var tests = A2($ElmTest.suite,
-   "A Test Suite",
-   _U.list([A2($ElmTest.test,
-   "createBricks",
-   A2($ElmTest.assertEqual,
-   A3($Bricks.createSubsequentBricks,1,brick,bricks),
-   _U.list([{x: -213,y: 193,vy: 0,vx: 0,color: $Color.green,hit: false},{x: -279,y: 193,vy: 0,vx: 0,color: $Color.green,hit: false}])))]));
-   var main = $ElmTest.elementRunner(tests);
-   return _elm.BricksTest.values = {_op: _op,brick: brick,bricks: bricks,tests: tests,main: main};
+   var txt = function (f) {
+      return function (_p0) {
+         return $Graphics$Element.leftAligned(f($Text.monospace(A2($Text.color,$Constants.textIvory,$Text.fromString(_p0)))));
+      };
+   };
+   var display = F2(function (_p2,_p1) {
+      var _p3 = _p2;
+      var _p4 = _p1;
+      var _p5 = _p4.ball;
+      var shapes = A3($Object.createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
+      var brickDisplay = A2($Bricks.displayBricks,_p4.bricks,shapes);
+      var displayObjects = A2($List.append,
+      _U.list([A2($Graphics$Collage.filled,$Constants.breakoutCharcoal,A2($Graphics$Collage.rect,$Constants.gameWidth,$Constants.gameHeight))
+              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.oval,15,15),$Color.white)
+              ,A3($Object.displayObj,_p4.player,A2($Graphics$Collage.rect,40,10),$Color.white)]),
+      brickDisplay);
+      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.y));
+      return A4($Graphics$Element.container,
+      _p3._0,
+      _p3._1,
+      $Graphics$Element.middle,
+      A3($Graphics$Collage.collage,$Constants.gameWidth,$Constants.gameHeight,displayObjects));
+   });
+   var main = A3($Signal.map2,display,$Window.dimensions,$Game.gameState);
+   return _elm.Breakout.values = {_op: _op,txt: txt,display: display,main: main};
 };
