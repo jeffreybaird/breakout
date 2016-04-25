@@ -6965,7 +6965,7 @@ Elm.Ball.make = function (_elm) {
    var near = F3(function (object1,distance,object2) {    return _U.cmp(object2,object1 - distance) > -1 && _U.cmp(object2,object1 + distance) < 1;});
    var within = F2(function (ball,player) {    return A3(near,player.x,8,ball.x) && A3(near,player.y,20,ball.y);});
    var stepV = F3(function (v,lowerCollision,upperCollision) {    return lowerCollision ? $Basics.abs(v) : upperCollision ? 0 - $Basics.abs(v) : v;});
-   var withinBrick = F2(function (ball,brick) {    return A3(near,ball.x,15,brick.x) && A3(near,ball.y,20,brick.y);});
+   var withinBrick = F2(function (ball,brick) {    return A3(near,ball.x,30,brick.x) && A3(near,ball.y,16,brick.y);});
    var isTrue = function (x) {    return _U.eq(x,true);};
    var ballWithinBricks = F2(function (ball,bricks) {    return A2($List.any,isTrue,A2($List.map,withinBrick(ball),bricks));});
    return _elm.Ball.values = {_op: _op,isTrue: isTrue,withinBrick: withinBrick,ballWithinBricks: ballWithinBricks,stepV: stepV,near: near,within: within};
@@ -7015,8 +7015,9 @@ Elm.Game.make = function (_elm) {
    });
    var stepBrick = F3(function (time,ball,_p6) {    var _p7 = _p6;var _p8 = _p7;return A2(stepObj,time,_U.update(_p8,{x: A2(remove,_p8,ball)}));});
    var stepBricks = F3(function (time,bricks,ball) {
-      var br = A2($Debug.watch,"Bricks X",A2($List.map,function (_) {    return _.x;},bricks));
       var brs = A2($Debug.watch,"Bricks",A2($List.map,$Ball.withinBrick(ball),bricks));
+      var xy = function (brick) {    return _U.list([brick.x,brick.y]);};
+      var br = A2($Debug.watch,"Bricks X,Y",A2($List.map,xy,bricks));
       return A2($List.map,A2(stepBrick,time,ball),bricks);
    });
    var delta = A2($Signal.map,$Time.inSeconds,$Time.fps(35));

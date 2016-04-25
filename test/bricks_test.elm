@@ -16,7 +16,10 @@ bricks =
 tests : Test
 tests =
     suite "A Test Suite"
-        [ test "createBricks" (assertEqual (createSubsequentBricks 1 brick bricks) [{ x = -213, y = 193, vy = 0, vx = 0, color = Color.green},{ x = -279, y = 193, vy = 0, vx = 0, color = Color.green }])
+        [ test "createBricks" (
+          assertEqual (createSubsequentBricks 1 brick bricks)
+          [{ x = -213, y = 193, vy = 0, vx = 0, color = Color.green},
+          { x = -279, y = 193, vy = 0, vx = 0, color = Color.green}])
         ]
 
 main : Element

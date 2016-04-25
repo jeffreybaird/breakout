@@ -1,7 +1,6 @@
 module Player where
 import Object exposing (..)
 import Constants exposing (..)
-import Time
 
 type alias Player =
   Object {score : Int}

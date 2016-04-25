@@ -51,7 +51,7 @@ stepBricks time bricks ball =
     xy brick =
       [brick.x, brick.y]
     brs = Debug.watch "Bricks" (List.map (withinBrick ball) bricks)
-    br = Debug.watch "Bricks X,Y" (List.map xy bricks) 
+    br = Debug.watch "Bricks X,Y" (List.map xy bricks)
   in
     List.map (stepBrick time ball) bricks
 

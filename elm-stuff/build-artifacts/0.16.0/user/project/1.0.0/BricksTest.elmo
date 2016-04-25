@@ -1,0 +1,30 @@
+Elm.BricksTest = Elm.BricksTest || {};
+Elm.BricksTest.make = function (_elm) {
+   "use strict";
+   _elm.BricksTest = _elm.BricksTest || {};
+   if (_elm.BricksTest.values) return _elm.BricksTest.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bricks = Elm.Bricks.make(_elm),
+   $Color = Elm.Color.make(_elm),
+   $Constants = Elm.Constants.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $ElmTest = Elm.ElmTest.make(_elm),
+   $Graphics$Element = Elm.Graphics.Element.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var brick = {x: 21 - $Constants.halfWidth,y: $Constants.halfHeight - 7,vy: 0,vx: 0,color: $Color.green};
+   var bricks = _U.list([brick]);
+   var tests = A2($ElmTest.suite,
+   "A Test Suite",
+   _U.list([A2($ElmTest.test,
+   "createBricks",
+   A2($ElmTest.assertEqual,
+   A3($Bricks.createSubsequentBricks,1,brick,bricks),
+   _U.list([{x: -213,y: 193,vy: 0,vx: 0,color: $Color.green},{x: -279,y: 193,vy: 0,vx: 0,color: $Color.green}])))]));
+   var main = $ElmTest.elementRunner(tests);
+   return _elm.BricksTest.values = {_op: _op,brick: brick,bricks: bricks,tests: tests,main: main};
+};
