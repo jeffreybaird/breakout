@@ -4,6 +4,14 @@
 
 # [Demo](http://jeffreyleebaird.com/breakout)
 
+## To Develop
+
+1. Install elm 0.16
+2. Fork this repo
+3. Clone it locally
+4. cd into the directory
+5. Run `$elm make breakout.elm`
+6. Agree to the prompts
 
 ## To Do List:
 
