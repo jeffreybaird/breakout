@@ -37,8 +37,8 @@ remove ball brick =
     if withinBrick ball brick then True
     else brick.hit
 
-move: Brick -> Float
-move brick =
+moveBrick: Brick -> Float
+moveBrick brick =
   if brick.hit then gameHeight + 1000
   else brick.x
 
@@ -64,7 +64,7 @@ stepBricks bricks ball =
 
 stepBrick : Ball -> Brick -> Brick
 stepBrick ball brick =
-  { brick | hit = (remove ball brick), x = (move brick)}
+  { brick | hit = (remove ball brick), x = (moveBrick brick)}
 
 defaultGame : Game
 defaultGame =
@@ -98,14 +98,20 @@ stepBall time ({x,y,vx,vy} as ball) player bricks =
               stepV vx (x < 7-halfWidth) (x > halfWidth-7)
         }
 
-stepPlayer : Time.Time -> Int -> Player -> Player
-stepPlayer time direction player =
+stepPlayer : Time.Time -> Int -> Player -> Bricks -> Player
+stepPlayer time direction player bricks =
     let player' = stepObj time { player | vx = toFloat direction* 300 }
         x'      = clamp (22-halfWidth) (halfWidth-22) player'.x
-        score'  = player.score + 1
+        score'  = player.score
+
+        total_score : Int
+        total_score =
+              List.length <|
+                  List.filter isTrue <|
+                  List.map .hit bricks
 
     in
-      { player' | x = x', score = score' }
+      { player' | x = x', score = total_score }
 
 outOfPlayArea : Ball -> Bool
 outOfPlayArea ball =
@@ -118,7 +124,7 @@ stepGame input game =
     {space, paddle,delta} = input
     {ball, state,player, bricks} = game
     bricks' = stepBricks bricks ball
-    player' = stepPlayer delta paddle player
+    player' = stepPlayer delta paddle player bricks
     ball' =
         if state == Pause
             then ball

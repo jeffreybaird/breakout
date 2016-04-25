@@ -20,7 +20,7 @@ display : (Int, Int) -> Game -> Graphics.Element.Element
 display (w,h) {ball,state,player, bricks} =
     let scores : Graphics.Element.Element
         scores =
-            toString ball.y
+            toString player.score
               |> txt (Text.height 50)
         shapes : List Shape
         shapes =
@@ -35,6 +35,8 @@ display (w,h) {ball,state,player, bricks} =
           List.append [ filled breakoutCharcoal   (rect gameWidth gameHeight)
           , displayObj ball (oval 15 15) Color.white
           , displayObj player (rect 40 10) Color.white
+          , toForm scores
+           |> move (-20, 0)
           ] brickDisplay
 
     in

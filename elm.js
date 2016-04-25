@@ -7052,17 +7052,17 @@ Elm.Game.make = function (_elm) {
       ,vx: A3($Ball.stepV,_p3.vx,_U.cmp(_p5,7 - $Constants.halfWidth) < 0,_U.cmp(_p5,$Constants.halfWidth - 7) > 0)}));
    });
    var stepPlayer = F3(function (time,direction,player) {
-      var score$ = player.score + 1;
+      var score$ = player.score;
       var player$ = A2(stepObj,time,_U.update(player,{vx: $Basics.toFloat(direction) * 300}));
       var x$ = A3($Basics.clamp,22 - $Constants.halfWidth,$Constants.halfWidth - 22,player$.x);
       return _U.update(player$,{x: x$,score: score$});
    });
-   var move = function (brick) {    return brick.hit ? $Constants.gameHeight + 1000 : brick.x;};
+   var moveBrick = function (brick) {    return brick.hit ? $Constants.gameHeight + 1000 : brick.x;};
    var remove = F2(function (ball,brick) {
       var b = A2($Debug.watch,"Ball",_U.list([ball.x,ball.y]));
       return A2($Ball.withinBrick,ball,brick) ? true : brick.hit;
    });
-   var stepBrick = F2(function (ball,brick) {    return _U.update(brick,{hit: A2(remove,ball,brick),x: move(brick)});});
+   var stepBrick = F2(function (ball,brick) {    return _U.update(brick,{hit: A2(remove,ball,brick),x: moveBrick(brick)});});
    var stepBricks = F2(function (bricks,ball) {
       var a = A2($Debug.watch,"Hit",A2($List.map,remove(ball),bricks));
       var b = A2($Debug.watch,"Ball Within Bricks",A2($List.map,$Ball.withinBrick(ball),bricks));
@@ -7102,7 +7102,7 @@ Elm.Game.make = function (_elm) {
                              ,Game: Game
                              ,delta: delta
                              ,remove: remove
-                             ,move: move
+                             ,moveBrick: moveBrick
                              ,stepObj: stepObj
                              ,stepBricks: stepBricks
                              ,stepBrick: stepBrick
@@ -7144,15 +7144,16 @@ Elm.Breakout.make = function (_elm) {
    var display = F2(function (_p2,_p1) {
       var _p3 = _p2;
       var _p4 = _p1;
-      var _p5 = _p4.ball;
+      var _p5 = _p4.player;
       var shapes = A3($Object.createShapes,10,A2($Graphics$Collage.rect,60,10),_U.list([]));
       var brickDisplay = A2($Bricks.displayBricks,_p4.bricks,shapes);
+      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.score));
       var displayObjects = A2($List.append,
       _U.list([A2($Graphics$Collage.filled,$Constants.breakoutCharcoal,A2($Graphics$Collage.rect,$Constants.gameWidth,$Constants.gameHeight))
-              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.oval,15,15),$Color.white)
-              ,A3($Object.displayObj,_p4.player,A2($Graphics$Collage.rect,40,10),$Color.white)]),
+              ,A3($Object.displayObj,_p4.ball,A2($Graphics$Collage.oval,15,15),$Color.white)
+              ,A3($Object.displayObj,_p5,A2($Graphics$Collage.rect,40,10),$Color.white)
+              ,A2($Graphics$Collage.move,{ctor: "_Tuple2",_0: 0,_1: 0},$Graphics$Collage.toForm(scores))]),
       brickDisplay);
-      var scores = A2(txt,$Text.height(50),$Basics.toString(_p5.y));
       return A4($Graphics$Element.container,
       _p3._0,
       _p3._1,

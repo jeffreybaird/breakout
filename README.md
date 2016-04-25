@@ -25,9 +25,8 @@ Must have:
 5. ~~Multiple rows of bricks~~
 6. ~~Game restarts once the ball goes out of play~~
 7. ~~Game is started with the press of the space bar~~
-8. A method for scoring and displaying the score
+8. ~~A method for scoring and displaying the score~~
 9. "Game Over" is displayed along with the score. Player restarts the game.
-10. Deployment test
 
 Should have:
 
@@ -44,6 +43,7 @@ Nice to have:
 3. the paddle bounces slightly off each wall
 4. Sounds play when the ball hits the paddle and the bricks
 5. Motion of the paddle affects angle of ball
+6. The score shouldn't be in the way, figure out somewhere else to put it.
 
 Known Bugs:
 
