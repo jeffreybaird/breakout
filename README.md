@@ -32,6 +32,8 @@ Should have:
 1. Every time a row of bricks goes away, the ball goes faster
 2. Every time a row of bricks goes away, the paddle gets smaller
 3. When a row of bricks disappears, a new one appears behind it.
+4. Ball starts from the paddle
+5. User picks direction for initial shot
 
 Nice to have:
 
@@ -39,6 +41,7 @@ Nice to have:
 2. Animation when the brick is hit
 3. the paddle bounces slightly off each wall
 4. Sounds play when the ball hits the paddle and the bricks
+5. Motion of the paddle affects angle of ball
 
 Known Bugs:
 
