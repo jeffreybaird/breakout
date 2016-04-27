@@ -43,7 +43,7 @@ Nice to have:
 3. the paddle bounces slightly off each wall
 4. Sounds play when the ball hits the paddle and the bricks
 5. Motion of the paddle affects angle of ball
-6.~~ The score shouldn't be in the way, figure out somewhere else to put it.~~
+6. ~~The score shouldn't be in the way, figure out somewhere else to put it.~~
 
 Known Bugs:
 
